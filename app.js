@@ -13,9 +13,9 @@ const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API P3 Cédula',
+      title: 'API P3_31031669',
       version: '1.0.0',
-      description: 'API RESTful para el proyecto P3',
+      description: 'API RESTful para el proyecto P3_31031669',
     },
   },
   apis: [path.join(__dirname, 'app.js')], // Ruta absoluta
@@ -76,8 +76,8 @@ app.get('/about', function(req, res) {
   res.json({
     status: "success",
     data: {
-      nombreCompleto: "Estefani Jeannielys Gonzalez Gonzalez",
-      cedula: "32057736",
+      nombreCompleto: "Cristhian Alfonzo Angyalbert Padron",
+      cedula: "31031669",
       seccion: "2"
     }
   });
