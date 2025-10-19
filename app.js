@@ -13,9 +13,9 @@ const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API P3 Cédula',
+      title: 'API P3_32057736',
       version: '1.0.0',
-      description: 'API RESTful para el proyecto P3',
+      description: 'API RESTful para el proyecto P3_32057736',
     },
   },
   apis: [path.join(__dirname, 'app.js')], // Ruta absoluta
