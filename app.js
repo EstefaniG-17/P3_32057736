@@ -13,7 +13,7 @@ const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API P3_32057736',
+      title: 'API de P3_32057736',
       version: '1.0.0',
       description: 'API RESTful para el proyecto P3_32057736',
     },
