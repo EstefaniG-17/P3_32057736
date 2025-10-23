@@ -7,13 +7,14 @@ var swaggerUi = require('swagger-ui-express');
 
 var app = express();
 
+// Middlewares
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuración de Swagger CORREGIDA
+// Configuración de Swagger
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -29,13 +30,11 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: [path.join(__dirname, 'app.js')], // ✅ RUTA ABSOLUTA - ESTO ES CLAVE
+  apis: [path.join(__dirname, 'app.js')],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// ✅ COMENTARIOS SWAGGER CORREGIDOS - DEBEN ESTAR JUSTO ANTES de cada ruta
 
 /**
  * @swagger
@@ -73,7 +72,7 @@ app.get('/ping', function(req, res) {
  *                   properties:
  *                     nombreCompleto:
  *                       type: string
- *                       example: "Estefani Jeannielyz Gonzalez Gonzalez"
+ *                       example: "Estefani Jeannielys Gonzalez Gonzalez"
  *                     cedula:
  *                       type: string
  *                       example: "32057736"
@@ -85,9 +84,9 @@ app.get('/about', function(req, res) {
   res.json({
     status: "success",
     data: {
-      nombreCompleto: "Estefani Jeannielyz Gonzalez Gonzalez", // Reemplaza con tu nombre
-      cedula: "32057736", // Reemplaza con tu cédula
-      seccion: "2" // Reemplaza con tu sección
+      nombreCompleto: "Estefani Jeannielys Gonzalez Gonzalez",
+      cedula: "32057736",
+      seccion: "2"
     }
   });
 });
