@@ -27,20 +27,23 @@ jobs:
     - name: Install dependencies
       run: npm install
     
-    - name: Create environment file
+    - name: Create test environment file
       run: |
         echo "NODE_ENV=test" > .env
-        echo "JWT_SECRET=test_jwt_secret_for_github_actions" >> .env
+        echo "JWT_SECRET=test_jwt_secret_for_github_actions_$(openssl rand -hex 32)" >> .env
         echo "PORT=3000" >> .env
     
-    - name: Run tests
-      run: npm test
+    - name: Run tests with coverage
+      run: npm test -- --coverage --forceExit --detectOpenHandles
       env:
         NODE_ENV: test
         JWT_SECRET: test_jwt_secret_for_github_actions
     
-    - name: Test build
-      run: npm start &
-      env:
-        NODE_ENV: test
-        JWT_SECRET: test_jwt_secret_for_github_actions
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.node-version }}
+        path: |
+          coverage/
+          test-results/
