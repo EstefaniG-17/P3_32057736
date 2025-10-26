@@ -26,5 +26,14 @@ jobs:
     - name: Install dependencies
       run: npm install
     
+    - name: Create environment file
+      run: |
+        echo "NODE_ENV=test" > .env
+        echo "JWT_SECRET=test_jwt_secret_for_ci_$GITHUB_SHA" >> .env
+        echo "PORT=3000" >> .env
+    
     - name: Run tests
-      run: npm test
+      run: npx jest --forceExit --detectOpenHandles --verbose
+      env:
+        NODE_ENV: test
+        JWT_SECRET: test_jwt_secret_for_ci_123456
