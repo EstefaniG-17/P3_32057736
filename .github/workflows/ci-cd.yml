@@ -1,8 +1,8 @@
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -15,8 +15,7 @@ jobs:
         node-version: [18.x, 20.x]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -27,23 +26,5 @@ jobs:
     - name: Install dependencies
       run: npm install
     
-    - name: Create test environment file
-      run: |
-        echo "NODE_ENV=test" > .env
-        echo "JWT_SECRET=test_jwt_secret_for_github_actions_$(openssl rand -hex 32)" >> .env
-        echo "PORT=3000" >> .env
-    
-    - name: Run tests with coverage
-      run: npm test -- --coverage --forceExit --detectOpenHandles
-      env:
-        NODE_ENV: test
-        JWT_SECRET: test_jwt_secret_for_github_actions
-    
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results-${{ matrix.node-version }}
-        path: |
-          coverage/
-          test-results/
+    - name: Run tests
+      run: npm test
