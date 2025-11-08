@@ -52,7 +52,9 @@ User.prototype.validatePassword = async function(password) {
 const syncDatabase = async () => {
   try {
     await sequelize.sync();
-    console.log('Database synchronized successfully');
+    if (process.env.NODE_ENV !== 'test') {
+      console.log('Database synchronized successfully');
+    }
   } catch (error) {
     console.error('Database sync error:', error);
   }

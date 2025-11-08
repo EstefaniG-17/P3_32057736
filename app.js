@@ -3,12 +3,11 @@ require('dotenv').config();
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
-const { syncDatabase } = require('./database'); // ← Cambiado de './config/database'
 
 const app = express();
 
-// Sincronizar base de datos al iniciar
-syncDatabase();
+// Nota: la sincronización de la base de datos se realiza en el binario (./bin/www)
+// para evitar efectos secundarios cuando `app` es requerido por tests.
 
 // Middleware
 app.use(express.json());
@@ -19,10 +18,16 @@ app.use('/users', require('./routes/users'));
 
 // Swagger
 try {
-  const swaggerDocument = YAML.load('./swagger.yaml');
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  const fs = require('fs');
+  const swaggerPath = './swagger.yaml';
+  if (fs.existsSync(swaggerPath)) {
+    const swaggerDocument = YAML.load(swaggerPath);
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  } else {
+    console.log('No swagger.yaml found — /api-docs disabled');
+  }
 } catch (error) {
-  console.log('Swagger documentation not available');
+  console.log('Error loading swagger documentation:', error.message || error);
 }
 
 // Health check
