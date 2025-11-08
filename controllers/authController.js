@@ -1,14 +1,14 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../../database');
+const User = require('../models/User');
 
 const register = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { nombreCompleto, email, password, cedula, seccion } = req.body;
 
-    if (!fullName || !email || !password) {
+    if (!nombreCompleto || !email || !password || !cedula || !seccion) {
       return res.status(400).json({
         status: 'fail',
-        message: 'Full name, email and password are required'
+        message: 'nombreCompleto, email, password, cedula y seccion son obligatorios'
       });
     }
 
@@ -20,7 +20,7 @@ const register = async (req, res) => {
       });
     }
 
-    const user = await User.create({ fullName, email, password });
+    const user = await User.create({ nombreCompleto, email, password, cedula, seccion });
 
     const token = jwt.sign(
       { userId: user.id, email: user.email },

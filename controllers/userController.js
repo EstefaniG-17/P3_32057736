@@ -1,9 +1,9 @@
-const { User } = require('../../database');
+const User = require('../models/User');
 
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: ['id', 'fullName', 'email', 'createdAt', 'updatedAt']
+      attributes: ['id', 'nombreCompleto', 'email', 'cedula', 'seccion', 'createdAt', 'updatedAt']
     });
     
     res.status(200).json({
@@ -11,6 +11,7 @@ const getAllUsers = async (req, res) => {
       data: users
     });
   } catch (error) {
+    console.error('userController.getAllUsers error:', error);
     res.status(500).json({
       status: 'error',
       message: 'Internal server error'
@@ -21,7 +22,7 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id, {
-      attributes: ['id', 'fullName', 'email', 'createdAt', 'updatedAt']
+      attributes: ['id', 'nombreCompleto', 'email', 'cedula', 'seccion', 'createdAt', 'updatedAt']
     });
 
     if (!user) {
@@ -45,12 +46,12 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { nombreCompleto, email, password, cedula, seccion } = req.body;
 
-    if (!fullName || !email || !password) {
+    if (!nombreCompleto || !email || !password || !cedula || !seccion) {
       return res.status(400).json({
         status: 'fail',
-        message: 'Full name, email and password are required'
+        message: 'nombreCompleto, email, password, cedula y seccion son obligatorios'
       });
     }
 
@@ -61,18 +62,18 @@ const createUser = async (req, res) => {
         message: 'User already exists with this email'
       });
     }
-
-    const user = await User.create({ fullName, email, password });
+    const user = await User.create({ nombreCompleto, email, password, cedula, seccion });
 
     res.status(201).json({
       status: 'success',
       data: {
         id: user.id,
-        fullName: user.fullName,
+        nombreCompleto: user.nombreCompleto,
         email: user.email
       }
     });
   } catch (error) {
+    console.error('userController.createUser error:', error);
     res.status(500).json({
       status: 'error',
       message: 'Internal server error'
@@ -82,8 +83,8 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { fullName, email } = req.body;
-    const user = await User.findByPk(req.params.id);
+  const { nombreCompleto, email, cedula, seccion } = req.body;
+  const user = await User.findByPk(req.params.id);
 
     if (!user) {
       return res.status(404).json({
@@ -102,13 +103,13 @@ const updateUser = async (req, res) => {
       }
     }
 
-    await user.update({ fullName, email });
+  await user.update({ nombreCompleto, email, cedula, seccion });
 
     res.status(200).json({
       status: 'success',
       data: {
         id: user.id,
-        fullName: user.fullName,
+        nombreCompleto: user.nombreCompleto,
         email: user.email
       }
     });
