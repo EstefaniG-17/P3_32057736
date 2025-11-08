@@ -23,7 +23,9 @@ jobs:
       run: npm install
     
     - name: Run tests
-      run: npm test
-      env:
-        NODE_ENV: test
-        JWT_SECRET: test_jwt_secret_for_ci_123456
+  run: |
+    chmod +x ./node_modules/.bin/jest
+    npm test
+  env:
+    NODE_ENV: test
+    JWT_SECRET: test_jwt_secret_for_ci_123456
