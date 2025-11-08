@@ -3,7 +3,7 @@ const { Sequelize } = require('sequelize');
 let storage;
 
 if (process.env.NODE_ENV === 'test') {
-  // Usar base de datos en memoria para tests (más rápido y aislado)
+  // Usar base de datos en memoria para tests
   storage = ':memory:';
 } else {
   storage = './database.sqlite';
@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'test') {
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: storage,
-  logging: process.env.NODE_ENV === 'development', // Solo logs en desarrollo
+  logging: false, // Desactivar logs en tests
   pool: {
     max: 5,
     min: 0,
@@ -20,14 +20,5 @@ const sequelize = new Sequelize({
     idle: 10000
   }
 });
-
-// Función para verificar conexión
-sequelize.authenticate()
-  .then(() => {
-    console.log(`✅ Conexión a SQLite establecida (${process.env.NODE_ENV || 'development'})`);
-  })
-  .catch(err => {
-    console.error('❌ Error conectando a SQLite:', err);
-  });
 
 module.exports = { sequelize };
