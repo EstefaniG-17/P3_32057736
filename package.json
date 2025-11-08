@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "dev": "nodemon ./bin/www",
-    "test": "jest --forceExit --detectOpenHandles --verbose",
-    "db:init": "node models/init.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "npx jest --forceExit --detectOpenHandles --verbose --coverage",
+    "build": "echo 'Build completed'"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
