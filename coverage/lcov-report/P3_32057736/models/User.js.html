@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">78.57% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/14</span>
+                <span class='fraction'>0/14</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">78.57% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/14</span>
+                <span class='fraction'>0/14</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -137,13 +137,11 @@
 <a name='L72'></a><a href='#L72'>72</a>
 <a name='L73'></a><a href='#L73'>73</a>
 <a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<a name='L75'></a><a href='#L75'>75</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -189,7 +187,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -200,22 +200,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span></td><td class="text"><pre class="prettyprint lang-js">const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
-const bcrypt = require('bcryptjs');
+<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const { DataTypes } = <span class="cstat-no" title="statement not covered" >require('sequelize');</span>
+const { sequelize } = <span class="cstat-no" title="statement not covered" >require('../config/database');</span>
+const bcrypt = <span class="cstat-no" title="statement not covered" >require('bcryptjs');</span>
 &nbsp;
-const User = sequelize.define('User', {
+const User = <span class="cstat-no" title="statement not covered" >sequelize.define('User', {</span>
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -262,8 +262,8 @@ const User = sequelize.define('User', {
   }
 }, {
   hooks: {
-    beforeCreate: async (user) =&gt; {
-      user.password = await bcrypt.hash(user.password, 12);
+    beforeCreate: <span class="fstat-no" title="function not covered" >as</span>ync (user) =&gt; {
+<span class="cstat-no" title="statement not covered" >      user.password = await bcrypt.hash(user.password, 12);</span>
     },
     beforeUpdate: <span class="fstat-no" title="function not covered" >as</span>ync (user) =&gt; {
 <span class="cstat-no" title="statement not covered" >      if (user.changed('password')) {</span>
@@ -274,25 +274,25 @@ const User = sequelize.define('User', {
 });
 &nbsp;
 // Método para comparar passwords
-User.prototype.validatePassword = <span class="fstat-no" title="function not covered" >as</span>ync function(password) {
+<span class="cstat-no" title="statement not covered" >User.prototype.validatePassword = <span class="fstat-no" title="function not covered" >as</span>ync function(password) {</span>
 <span class="cstat-no" title="statement not covered" >  return await bcrypt.compare(password, this.password);</span>
 };
 &nbsp;
 // Método para obtener datos públicos (sin password)
-User.prototype.toJSON = function() {
-  const values = { ...this.get() };
-  delete values.password;
-  return values;
+<span class="cstat-no" title="statement not covered" >User.prototype.toJSON = <span class="fstat-no" title="function not covered" >fu</span>nction() {</span>
+  const values = <span class="cstat-no" title="statement not covered" >{ ...this.get() };</span>
+<span class="cstat-no" title="statement not covered" >  delete values.password;</span>
+<span class="cstat-no" title="statement not covered" >  return values;</span>
 };
 &nbsp;
-module.exports = User;</pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >module.exports = User;</span></pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:19:23.809Z
+                at 2025-11-11T23:59:42.859Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
