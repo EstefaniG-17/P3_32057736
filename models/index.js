@@ -1,8 +1,14 @@
-// models/index.js
 const { Sequelize } = require('sequelize');
 const config = require('../config/database');
 
-const sequelize = new Sequelize(config.database, config.username, config.password, config);
+const env = process.env.NODE_ENV || 'development';
+const dbConfig = config[env];
+
+const sequelize = new Sequelize({
+  dialect: dbConfig.dialect,
+  storage: dbConfig.storage,
+  logging: dbConfig.logging
+});
 
 const db = {};
 
@@ -16,14 +22,26 @@ db.Tag = require('./Tag')(sequelize, Sequelize.DataTypes);
 db.Product = require('./Product')(sequelize, Sequelize.DataTypes);
 
 // Definir relaciones
-if (db.Product && db.Category) {
-  db.Product.belongsTo(db.Category);
-  db.Category.hasMany(db.Product);
-}
+db.Product.belongsTo(db.Category, { 
+  foreignKey: 'categoryId',
+  as: 'category'
+});
+db.Category.hasMany(db.Product, { 
+  foreignKey: 'categoryId',
+  as: 'products'
+});
 
-if (db.Product && db.Tag) {
-  db.Product.belongsToMany(db.Tag, { through: 'ProductTags' });
-  db.Tag.belongsToMany(db.Product, { through: 'ProductTags' });
-}
+db.Product.belongsToMany(db.Tag, { 
+  through: 'ProductTags',
+  foreignKey: 'productId',
+  otherKey: 'tagId',
+  as: 'tags'
+});
+db.Tag.belongsToMany(db.Product, { 
+  through: 'ProductTags',
+  foreignKey: 'tagId',
+  otherKey: 'productId',
+  as: 'products'
+});
 
 module.exports = db;

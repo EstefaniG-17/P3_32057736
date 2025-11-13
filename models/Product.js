@@ -1,5 +1,6 @@
-// models/product.js
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const Product = sequelize.define('Product', {
     id: {
       type: DataTypes.INTEGER,
@@ -17,56 +18,31 @@ module.exports = (sequelize, DataTypes) => {
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: true
     },
     price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false
     },
-    stock: {
+    categoryId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 0
+      references: {
+        model: 'categories',
+        key: 'id'
+      }
     },
-    // Atributos personalizados para libros de Maze Runner
-    isbn: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
-    },
-    publicationYear: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    publisher: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    edition: {
+    image: {
       type: DataTypes.STRING,
       allowNull: true
     },
-    language: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'English'
-    },
-    pageCount: {
+    stock: {
       type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    coverType: {
-      type: DataTypes.ENUM('Hardcover', 'Paperback', 'E-book'),
-      allowNull: false
-    },
-    genre: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    ageRange: {
-      type: DataTypes.STRING,
-      allowNull: false
+      defaultValue: 0
     }
+  }, {
+    tableName: 'products',
+    timestamps: true
   });
 
   return Product;

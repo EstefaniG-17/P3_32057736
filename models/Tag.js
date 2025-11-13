@@ -1,5 +1,6 @@
-// models/Tag.js
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const Tag = sequelize.define('Tag', {
     id: {
       type: DataTypes.INTEGER,
@@ -12,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       unique: true
     }
   }, {
-    tableName: 'tags'
+    tableName: 'tags',
+    timestamps: true
   });
 
   return Tag;

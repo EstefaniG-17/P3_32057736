@@ -3,9 +3,13 @@ require('dotenv').config();
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
-
+const path = require('path');
 const app = express();
+// Cargar el archivo YAML
+const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));
 
+// Configurar Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Nota: la sincronización de la base de datos se realiza en el binario (./bin/www)
 // para evitar efectos secundarios cuando `app` es requerido por tests.
 
@@ -64,5 +68,7 @@ app.use('*', (req, res) => {
     message: 'Route not found'
   });
 });
-
+app.use('/categories', require('./routes/categories'));
+app.use('/products', require('./routes/products')); 
+app.use('/tags', require('./routes/tags'));
 module.exports = app;
