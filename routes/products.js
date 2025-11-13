@@ -3,11 +3,14 @@ const router = express.Router();
 const productController = require('../controllers/productController');
 const auth = require('../middleware/auth');
 
-// Rutas públicas
-router.get('/', productController.search);
-router.get('/:id', productController.getBySlug);
+// ✅ RUTAS PÚBLICAS
+router.get('/', productController.search); // Búsqueda avanzada con filtros
+router.get('/p/:id-:slug', productController.getBySlug); // Self-healing URL
 
-// Rutas protegidas
+// ✅ RUTAS PROTEGIDAS
 router.post('/', auth, productController.create);
+router.get('/:id', auth, productController.getById); // Para administración
+router.put('/:id', auth, productController.update);
+router.delete('/:id', auth, productController.delete);
 
 module.exports = router;

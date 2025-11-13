@@ -68,6 +68,11 @@ app.use('/categories', require('./routes/categories'));
 app.use('/products', require('./routes/products'));
 app.use('/tags', require('./routes/tags'));
 
+// Ruta pública de 'self-healing' para productos en la raíz: /p/:id-:slug
+// Algunos tests y clientes esperan acceder a productos mediante /p/{id}-{slug}
+const productController = require('./controllers/productController');
+app.get('/p/:id-:slug', productController.getBySlug);
+
 // Swagger
 try {
   const fs = require('fs');

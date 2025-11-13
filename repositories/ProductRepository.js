@@ -1,117 +1,41 @@
-// repositories/ProductRepository.js
+const ProductQueryBuilder = require('../services/ProductQueryBuilder');
+
 class ProductRepository {
-  constructor(models) {
+  constructor(models, sequelize) {
     this.Product = models.Product;
     this.Category = models.Category;
     this.Tag = models.Tag;
+    this.sequelize = sequelize;
   }
 
-  // Builder para consultas avanzadas
-  buildQuery(filters = {}) {
-    const {
-      page = 1,
-      limit = 10,
-      category,
-      tags,
-      price_min,
-      price_max,
-      search,
-      publisher,
-      coverType,
-      language,
-      genre,
-      ageRange,
-      publicationYear
-    } = filters;
+  async findAllWithFilters(filters = {}) {
+    const queryBuilder = new ProductQueryBuilder(this.Product, this.sequelize);
+    
+    const result = await queryBuilder
+      .withCategory()
+      .withTags()
+      .filterByPrice(filters.price_min, filters.price_max)
+      .filterByCategory(filters.category)
+      .filterByTags(filters.tags)
+      .search(filters.search)
+      // ✅ FILTROS PERSONALIZADOS
+      .filterByAuthor(filters.author)
+      .filterByPublisher(filters.publisher)
+      .filterByFormat(filters.format)
+      .filterByLanguage(filters.language)
+      .filterByPublicationYear(filters.publicationYear)
+      .filterByAvailable(filters.available)
+      .paginate(filters.page, filters.limit)
+      .execute();
 
-    const offset = (page - 1) * limit;
-    const where = {};
-    const include = [];
-
-    // Filtro por categoría
-    if (category) {
-      include.push({
-        model: this.Category,
-        where: { 
-          [Op.or]: [
-            { id: category },
-            { name: { [Op.like]: `%${category}%` } }
-          ]
-        },
-        required: true
-      });
-    }
-
-    // Filtro por tags
-    if (tags) {
-      const tagIds = Array.isArray(tags) ? tags : tags.split(',');
-      include.push({
-        model: this.Tag,
-        where: { id: { [Op.in]: tagIds } },
-        required: true
-      });
-    }
-
-    // Filtro por rango de precio
-    if (price_min || price_max) {
-      where.price = {};
-      if (price_min) where.price[Op.gte] = parseFloat(price_min);
-      if (price_max) where.price[Op.lte] = parseFloat(price_max);
-    }
-
-    // Búsqueda en nombre y descripción
-    if (search) {
-      where[Op.or] = [
-        { name: { [Op.like]: `%${search}%` } },
-        { description: { [Op.like]: `%${search}%` } }
-      ];
-    }
-
-    // Filtros personalizados para libros
-    if (publisher) where.publisher = { [Op.like]: `%${publisher}%` };
-    if (coverType) where.coverType = coverType;
-    if (language) where.language = language;
-    if (genre) where.genre = { [Op.like]: `%${genre}%` };
-    if (ageRange) where.ageRange = ageRange;
-    if (publicationYear) where.publicationYear = publicationYear;
-
-    return {
-      where,
-      include: [
-        ...include,
-        {
-          model: this.Category,
-          attributes: ['id', 'name']
-        },
-        {
-          model: this.Tag,
-          attributes: ['id', 'name'],
-          through: { attributes: [] }
-        }
-      ],
-      limit: parseInt(limit),
-      offset: offset,
-      order: [['createdAt', 'DESC']]
-    };
-  }
-
-  async findWithFilters(filters = {}) {
-    const queryOptions = this.buildQuery(filters);
-    return await this.Product.findAndCountAll(queryOptions);
+    return result;
   }
 
   async findById(id) {
     return await this.Product.findByPk(id, {
       include: [
-        {
-          model: this.Category,
-          attributes: ['id', 'name']
-        },
-        {
-          model: this.Tag,
-          attributes: ['id', 'name'],
-          through: { attributes: [] }
-        }
+        { model: this.Category, as: 'category' },
+        { model: this.Tag, as: 'tags' }
       ]
     });
   }
@@ -120,15 +44,8 @@ class ProductRepository {
     return await this.Product.findOne({
       where: { slug },
       include: [
-        {
-          model: this.Category,
-          attributes: ['id', 'name']
-        },
-        {
-          model: this.Tag,
-          attributes: ['id', 'name'],
-          through: { attributes: [] }
-        }
+        { model: this.Category, as: 'category' },
+        { model: this.Tag, as: 'tags' }
       ]
     });
   }
@@ -138,14 +55,14 @@ class ProductRepository {
   }
 
   async update(id, productData) {
-    const product = await this.findById(id);
+    const product = await this.Product.findByPk(id);
     if (!product) return null;
     
     return await product.update(productData);
   }
 
   async delete(id) {
-    const product = await this.findById(id);
+    const product = await this.Product.findByPk(id);
     if (!product) return null;
     
     await product.destroy();
