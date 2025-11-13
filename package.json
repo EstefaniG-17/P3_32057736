@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
-    "test": "jest --forceExit --detectOpenHandles --verbose --coverage",
+    "test": "NODE_ENV=test jest --forceExit --detectOpenHandles --verbose --coverage",
+    "test:windows": "set NODE_ENV=test&& jest --forceExit --detectOpenHandles --verbose --coverage",
     "build": "echo 'Build completed'",
     "seed": "node scripts/runSeed.js"
   },

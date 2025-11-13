@@ -1,14 +1,19 @@
 const { Sequelize } = require('sequelize');
 const config = require('../config/database');
 
+// Usar la instancia de sequelize exportada por config/database si está disponible
 const env = process.env.NODE_ENV || 'development';
-const dbConfig = config[env];
-
-const sequelize = new Sequelize({
-  dialect: dbConfig.dialect,
-  storage: dbConfig.storage,
-  logging: dbConfig.logging
-});
+let sequelize;
+if (config && config.sequelize) {
+  sequelize = config.sequelize;
+} else {
+  const dbConfig = config[env];
+  sequelize = new Sequelize({
+    dialect: dbConfig.dialect,
+    storage: dbConfig.storage,
+    logging: dbConfig.logging
+  });
+}
 
 const db = {};
 

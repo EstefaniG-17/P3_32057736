@@ -13,8 +13,7 @@ module.exports = (sequelize) => {
     },
     slug: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
+      allowNull: false
     },
     description: {
       type: DataTypes.TEXT,
@@ -26,11 +25,7 @@ module.exports = (sequelize) => {
     },
     categoryId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'categories',
-        key: 'id'
-      }
+      allowNull: false
     },
     image: {
       type: DataTypes.STRING,

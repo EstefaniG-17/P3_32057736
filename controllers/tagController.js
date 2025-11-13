@@ -1,4 +1,3 @@
-// controllers/tagController.js
 const { Tag } = require('../models');
 
 const tagController = {
@@ -18,5 +17,4 @@ const tagController = {
   }
 };
 
-// ✅ EXPORTAR como objeto
 module.exports = tagController;

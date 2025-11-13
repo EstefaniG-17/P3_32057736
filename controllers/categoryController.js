@@ -1,4 +1,3 @@
-// controllers/categoryController.js
 const { Category } = require('../models');
 
 const categoryController = {
@@ -7,7 +6,7 @@ const categoryController = {
       const categories = await Category.findAll();
       res.json({
         status: 'success',
-        data: categories
+        data: categories || [] // ✅ Siempre retornar array
       });
     } catch (error) {
       res.status(500).json({
@@ -20,7 +19,19 @@ const categoryController = {
   create: async (req, res) => {
     try {
       const { name, description } = req.body;
-      const category = await Category.create({ name, description });
+      
+      if (!name) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Name is required'
+        });
+      }
+
+      const category = await Category.create({ 
+        name, 
+        description: description || '' 
+      });
+      
       res.status(201).json({
         status: 'success',
         data: category
@@ -34,5 +45,4 @@ const categoryController = {
   }
 };
 
-// ✅ EXPORTAR como objeto, no como instancia de clase
 module.exports = categoryController;

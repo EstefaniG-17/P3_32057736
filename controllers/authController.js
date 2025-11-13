@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken');
 const authController = {
   register: async (req, res) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, nombreCompleto, email, password, cedula, seccion, role } = req.body;
+      const fullName = nombreCompleto || name;
       
       // Verificar si el usuario ya existe
       const existingUser = await User.findOne({ where: { email } });
@@ -16,20 +17,20 @@ const authController = {
         });
       }
 
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Crear usuario
+      // Crear usuario (el hook del modelo hará el hash de la contraseña)
       const user = await User.create({
-        name,
+        nombreCompleto: fullName,
         email,
-        password: hashedPassword
+        password,
+        cedula: cedula || null,
+        seccion: seccion || null,
+        role: role || 'user'
       });
 
       // Generar token
       const token = jwt.sign(
         { userId: user.id, email: user.email },
-        process.env.JWT_SECRET || 'fallback-secret',
+        process.env.JWT_SECRET || 'test-secret',
         { expiresIn: '24h' }
       );
 
@@ -38,7 +39,7 @@ const authController = {
         data: {
           user: {
             id: user.id,
-            name: user.name,
+            nombreCompleto: user.nombreCompleto,
             email: user.email,
             role: user.role
           },
@@ -46,6 +47,7 @@ const authController = {
         }
       });
     } catch (error) {
+      console.error('Register error:', error);
       res.status(500).json({
         status: 'error',
         message: error.message
@@ -78,7 +80,7 @@ const authController = {
       // Generar token
       const token = jwt.sign(
         { userId: user.id, email: user.email },
-        process.env.JWT_SECRET || 'fallback-secret',
+        process.env.JWT_SECRET || 'test-secret',
         { expiresIn: '24h' }
       );
 
@@ -95,6 +97,7 @@ const authController = {
         }
       });
     } catch (error) {
+      console.error('Login error:', error);
       res.status(500).json({
         status: 'error',
         message: error.message

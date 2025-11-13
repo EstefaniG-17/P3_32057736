@@ -111,8 +111,6 @@ tags:
     description: Category management endpoints
   - name: Admin - Tags
     description: Tag management endpoints
-  - name: Authentication
-    description: User authentication endpoints
 
 paths:
   /products:
