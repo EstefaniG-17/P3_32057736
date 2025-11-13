@@ -1,102 +1,109 @@
+const { User } = require('../models');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 
-const register = async (req, res) => {
-  try {
-    const { nombreCompleto, email, password, cedula, seccion } = req.body;
-
-    if (!nombreCompleto || !email || !password || !cedula || !seccion) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'nombreCompleto, email, password, cedula y seccion son obligatorios'
-      });
-    }
-
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(409).json({
-        status: 'fail',
-        message: 'User already exists with this email'
-      });
-    }
-
-    const user = await User.create({ nombreCompleto, email, password, cedula, seccion });
-
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '24h' }
-    );
-
-    res.status(201).json({
-      status: 'success',
-      data: {
-        user: {
-          id: user.id,
-          fullName: user.fullName,
-          email: user.email
-        },
-        token
+const authController = {
+  register: async (req, res) => {
+    try {
+      const { name, nombreCompleto, email, password, cedula, seccion, role } = req.body;
+      const fullName = nombreCompleto || name;
+      
+      // Verificar si el usuario ya existe
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'User already exists'
+        });
       }
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: 'Internal server error'
-    });
+
+      // Crear usuario (el hook del modelo hará el hash de la contraseña)
+      const user = await User.create({
+        nombreCompleto: fullName,
+        email,
+        password,
+        cedula: cedula || null,
+        seccion: seccion || null,
+        role: role || 'user'
+      });
+
+      // Generar token
+      const token = jwt.sign(
+        { userId: user.id, email: user.email },
+        process.env.JWT_SECRET || 'test-secret',
+        { expiresIn: '24h' }
+      );
+
+      res.status(201).json({
+        status: 'success',
+        data: {
+          user: {
+            id: user.id,
+            nombreCompleto: user.nombreCompleto,
+            email: user.email,
+            role: user.role
+          },
+          token
+        }
+      });
+    } catch (error) {
+      console.error('Register error:', error);
+      res.status(500).json({
+        status: 'error',
+        message: error.message
+      });
+    }
+  },
+
+  login: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      // Buscar usuario
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Invalid credentials'
+        });
+      }
+
+      // Verificar password
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Invalid credentials'
+        });
+      }
+
+      // Generar token
+      const token = jwt.sign(
+        { userId: user.id, email: user.email },
+        process.env.JWT_SECRET || 'test-secret',
+        { expiresIn: '24h' }
+      );
+
+      res.json({
+        status: 'success',
+        data: {
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+          },
+          token
+        }
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({
+        status: 'error',
+        message: error.message
+      });
+    }
   }
 };
 
-const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'Email and password are required'
-      });
-    }
-
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(401).json({
-        status: 'fail',
-        message: 'Invalid credentials'
-      });
-    }
-
-    const isValidPassword = await user.validatePassword(password);
-    if (!isValidPassword) {
-      return res.status(401).json({
-        status: 'fail',
-        message: 'Invalid credentials'
-      });
-    }
-
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '24h' }
-    );
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        user: {
-          id: user.id,
-          fullName: user.fullName,
-          email: user.email
-        },
-        token
-      }
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: 'Internal server error'
-    });
-  }
-};
-
-module.exports = { register, login };
+module.exports = authController;

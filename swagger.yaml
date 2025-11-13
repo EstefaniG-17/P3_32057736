@@ -1,306 +1,17 @@
-# swagger.yaml
 openapi: 3.0.0
 info:
-  title: API RESTful - Gestión de Usuarios y Autenticación
-  description: |
-    Sistema robusto que persiste la información, gestiona la identidad de los usuarios 
-    y protege los recursos de accesos no autorizados.
+  title: Maze Runner Books API
+  description: API para gestión de libros de la saga Maze Runner con autenticación JWT
   version: 1.0.0
+  contact:
+    name: Estefani González
+    email: estefani@example.com
 
 servers:
-  - url: http://localhost:3000
-    description: Servidor local
-  - url: https://p3-32057736-4.onrender.com
+  - url: https://p3-32057736.onrender.com
     description: Servidor de producción
-
-tags:
-  - name: auth
-    description: Operaciones de autenticación
-  - name: users
-    description: Operaciones de gestión de usuarios (Protegidas)
-  - name: system
-    description: Operaciones del sistema
-
-paths:
-  /health:
-    get:
-      tags:
-        - system
-      summary: Verificar estado del servidor
-      responses:
-        '200':
-          description: Servidor funcionando correctamente
-
-  /ping:
-    get:
-      tags:
-        - system
-      summary: Ping al servidor
-      responses:
-        '200':
-          description: Respuesta exitosa
-
-  /about:
-    get:
-      tags:
-        - system
-      summary: Información del desarrollador
-      responses:
-        '200':
-          description: Información del desarrolladora
-          content:
-            application/json:
-              example:
-                status: "success"
-                data:
-                  nombreCompleto: "Estefani Jeannielys Gonzalez Gonzalez"
-                  cedula: "32057736"
-                  seccion: "1"
-
-  /auth/register:
-    post:
-      tags:
-        - auth
-      summary: Registrar nuevo usuario
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - fullName
-                - email
-                - password
-                - cedula
-              properties:
-                fullName:
-                  type: string
-                  example: "Juan Pérez"
-                email:
-                  type: string
-                  example: "juan@example.com"
-                password:
-                  type: string
-                  example: "password123"
-                cedula:
-                  type: string
-                  example: "12345678"
-      responses:
-        '201':
-          description: Usuario registrado exitosamente
-          content:
-            application/json:
-              example:
-                status: "success"
-                data:
-                  user:
-                    id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                    fullName: "Juan Pérez"
-                    email: "juan@example.com"
-                    cedula: "12345678"
-                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-
-  /auth/login:
-    post:
-      tags:
-        - auth
-      summary: Iniciar sesión
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  example: "juan@example.com"
-                password:
-                  type: string
-                  example: "password123"
-      responses:
-        '200':
-          description: Login exitoso
-          content:
-            application/json:
-              example:
-                status: "success"
-                data:
-                  user:
-                    id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                    fullName: "Juan Pérez"
-                    email: "juan@example.com"
-                    cedula: "12345678"
-                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-
-  /users:
-    get:
-      tags:
-        - users
-      summary: Obtener todos los usuarios
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Lista de usuarios obtenida exitosamente
-          content:
-            application/json:
-              example:
-                status: "success"
-                data:
-                  - id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                    fullName: "Juan Pérez"
-                    email: "juan@example.com"
-                    cedula: "12345678"
-                    createdAt: "2024-01-01T00:00:00.000Z"
-                    updatedAt: "2024-01-01T00:00:00.000Z"
-                  - id: "b2c3d4e5-f6g7-8901-bcde-f23456789012"
-                    fullName: "María García"
-                    email: "maria@example.com"
-                    cedula: "87654321"
-                    createdAt: "2024-01-01T00:00:00.000Z"
-                    updatedAt: "2024-01-01T00:00:00.000Z"
-
-    post:
-      tags:
-        - users
-      summary: Crear nuevo usuario
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - fullName
-                - email
-                - password
-                - cedula
-              properties:
-                fullName:
-                  type: string
-                  example: "Carlos López"
-                email:
-                  type: string
-                  example: "carlos@example.com"
-                password:
-                  type: string
-                  example: "password123"
-                cedula:
-                  type: string
-                  example: "11223344"
-      responses:
-        '201':
-          description: Usuario creado exitosamente
-          content:
-            application/json:
-              example:
-                status: "success"
-                data:
-                  id: "c3d4e5f6-g7h8-9012-cdef-345678901234"
-                  fullName: "Carlos López"
-                  email: "carlos@example.com"
-                  cedula: "11223344"
-                  createdAt: "2024-01-01T00:00:00.000Z"
-                  updatedAt: "2024-01-01T00:00:00.000Z"
-
-  /users/{id}:
-    get:
-      tags:
-        - users
-      summary: Obtener usuario por ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Usuario encontrado
-          content:
-            application/json:
-              example:
-                status: "success"
-                data:
-                  id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                  fullName: "Juan Pérez"
-                  email: "juan@example.com"
-                  cedula: "12345678"
-                  createdAt: "2024-01-01T00:00:00.000Z"
-                  updatedAt: "2024-01-01T00:00:00.000Z"
-
-    put:
-      tags:
-        - users
-      summary: Actualizar usuario
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                fullName:
-                  type: string
-                  example: "Juan Carlos Pérez"
-                email:
-                  type: string
-                  example: "juan.carlos@example.com"
-                cedula:
-                  type: string
-                  example: "12345678"
-      responses:
-        '200':
-          description: Usuario actualizado exitosamente
-          content:
-            application/json:
-              example:
-                status: "success"
-                data:
-                  id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                  fullName: "Juan Carlos Pérez"
-                  email: "juan.carlos@example.com"
-                  cedula: "12345678"
-                  updatedAt: "2024-01-02T00:00:00.000Z"
-
-    delete:
-      tags:
-        - users
-      summary: Eliminar usuario
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Usuario eliminado exitosamente
-          content:
-            application/json:
-              example:
-                status: "success"
-                data: null
-                message: "User deleted successfully"
+  - url: http://localhost:3000
+    description: Servidor de desarrollo
 
 components:
   securitySchemes:
@@ -308,3 +19,767 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: JWT token obtenido del endpoint /auth/login
+
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          description: Datos de la respuesta
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Juan Pérez
+        email:
+          type: string
+          example: juan@example.com
+        role:
+          type: string
+          enum: [admin, user]
+          example: user
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Ciencia Ficción
+        description:
+          type: string
+          example: Libros de ciencia ficción y distopía
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Distopía
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Maze Runner - Correr o Morir
+        slug:
+          type: string
+          example: maze-runner-correr-o-morir
+        description:
+          type: string
+          example: Primer libro de la saga Maze Runner
+        price:
+          type: number
+          format: float
+          example: 19.99
+        categoryId:
+          type: integer
+          example: 1
+        image:
+          type: string
+          nullable: true
+        stock:
+          type: integer
+          example: 10
+        # Atributos personalizados para libros
+        author:
+          type: string
+          example: James Dashner
+        isbn:
+          type: string
+          example: "978-8427200581"
+        publicationYear:
+          type: integer
+          example: 2009
+        publisher:
+          type: string
+          example: V&R Editoras
+        language:
+          type: string
+          example: Español
+        pages:
+          type: integer
+          example: 384
+        format:
+          type: string
+          enum: [Tapa blanda, Tapa dura, E-book]
+          example: Tapa blanda
+        isAvailable:
+          type: boolean
+          example: true
+        category:
+          $ref: '#/components/schemas/Category'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AuthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            token:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    ProductSearchResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        pagination:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 15
+            page:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            totalPages:
+              type: integer
+              example: 2
+
+security:
+  - bearerAuth: []
+
+paths:
+  /about:
+    get:
+      tags:
+        - Public
+      summary: Información del desarrollador
+      description: Retorna información personal del desarrollador
+      responses:
+        '200':
+          description: Información obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      nombreCompleto:
+                        type: string
+                        example: Estefani Jeannielys Gonzalez González
+                      cedula:
+                        type: string
+                        example: 32057736
+                      seccion:
+                        type: string
+                        example: 1
+
+  /ping:
+    get:
+      tags:
+        - Public
+      summary: Health check
+      description: Verifica que la API esté funcionando
+      responses:
+        '200':
+          description: API funcionando correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Registrar nuevo usuario
+      description: Crea una nueva cuenta de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  example: Juan Pérez
+                email:
+                  type: string
+                  example: juan@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Iniciar sesión
+      description: Autentica un usuario y retorna un token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: juan@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    get:
+      tags:
+        - Admin - Users
+      summary: Obtener todos los usuarios
+      description: Retorna la lista de todos los usuarios (requiere autenticación)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories:
+    get:
+      tags:
+        - Admin - Categories
+      summary: Obtener todas las categorías
+      description: Retorna la lista de categorías (requiere autenticación)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de categorías obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Admin - Categories
+      summary: Crear nueva categoría
+      description: Crea una nueva categoría (requiere autenticación)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Ciencia Ficción
+                description:
+                  type: string
+                  example: Libros de ciencia ficción
+      responses:
+        '201':
+          description: Categoría creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tags:
+    get:
+      tags:
+        - Admin - Tags
+      summary: Obtener todos los tags
+      description: Retorna la lista de tags (requiere autenticación)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de tags obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products:
+    get:
+      tags:
+        - Public - Products
+      summary: Búsqueda avanzada de productos
+      description: |
+        Busca y filtra productos de forma pública. Incluye paginación y múltiples filtros.
+        
+        **Filtros disponibles:**
+        - `search`: Búsqueda por nombre, descripción o autor
+        - `category`: Filtrar por ID de categoría
+        - `tags`: Filtrar por IDs de tags (separados por coma)
+        - `price_min` y `price_max`: Rango de precios
+        - `author`: Filtrar por autor
+        - `publisher`: Filtrar por editorial
+        - `format`: Filtrar por formato (Tapa blanda, Tapa dura, E-book)
+        - `language`: Filtrar por idioma
+        - `publicationYear`: Filtrar por año de publicación
+        - `available`: Filtrar por disponibilidad (true/false)
+        - `page` y `limit`: Paginación
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Término de búsqueda en nombre, descripción o autor
+        - in: query
+          name: category
+          schema:
+            type: integer
+          description: ID de categoría
+        - in: query
+          name: tags
+          schema:
+            type: string
+          description: IDs de tags separados por coma (ej. 1,2,3)
+        - in: query
+          name: price_min
+          schema:
+            type: number
+          description: Precio mínimo
+        - in: query
+          name: price_max
+          schema:
+            type: number
+          description: Precio máximo
+        - in: query
+          name: author
+          schema:
+            type: string
+          description: Filtrar por autor
+        - in: query
+          name: publisher
+          schema:
+            type: string
+          description: Filtrar por editorial
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [Tapa blanda, Tapa dura, E-book]
+          description: Filtrar por formato
+        - in: query
+          name: language
+          schema:
+            type: string
+          description: Filtrar por idioma
+        - in: query
+          name: publicationYear
+          schema:
+            type: integer
+          description: Filtrar por año de publicación
+        - in: query
+          name: available
+          schema:
+            type: boolean
+          description: Filtrar por disponibilidad
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Número de página
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Límite de resultados por página
+      responses:
+        '200':
+          description: Búsqueda exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSearchResponse'
+
+    post:
+      tags:
+        - Admin - Products
+      summary: Crear nuevo producto
+      description: Crea un nuevo producto de libro (requiere autenticación)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+                - categoryId
+                - author
+                - isbn
+                - publicationYear
+                - pages
+              properties:
+                name:
+                  type: string
+                  example: Maze Runner - Correr o Morir
+                slug:
+                  type: string
+                  example: maze-runner-correr-o-morir
+                description:
+                  type: string
+                  example: Primer libro de la saga Maze Runner
+                price:
+                  type: number
+                  example: 19.99
+                categoryId:
+                  type: integer
+                  example: 1
+                image:
+                  type: string
+                  nullable: true
+                stock:
+                  type: integer
+                  example: 10
+                author:
+                  type: string
+                  example: James Dashner
+                isbn:
+                  type: string
+                  example: "978-8427200581"
+                publicationYear:
+                  type: integer
+                  example: 2009
+                publisher:
+                  type: string
+                  example: V&R Editoras
+                language:
+                  type: string
+                  example: Español
+                pages:
+                  type: integer
+                  example: 384
+                format:
+                  type: string
+                  enum: [Tapa blanda, Tapa dura, E-book]
+                  example: Tapa blanda
+                tags:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2]
+      responses:
+        '201':
+          description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /p/{id}-{slug}:
+    get:
+      tags:
+        - Public - Products
+      summary: Obtener producto por URL amigable
+      description: |
+        Obtiene un producto por su ID y slug. Incluye funcionalidad de "self-healing":
+        si el slug no coincide con el actual, redirige automáticamente a la URL correcta.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del producto
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+          description: Slug del producto (para URLs amigables)
+      responses:
+        '200':
+          description: Producto obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '301':
+          description: Redirección a la URL correcta (self-healing)
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL correcta del producto
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{id}:
+    get:
+      tags:
+        - Admin - Products
+      summary: Obtener producto por ID (admin)
+      description: Obtiene un producto por su ID para administración (requiere autenticación)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Admin - Products
+      summary: Actualizar producto
+      description: Actualiza un producto existente (requiere autenticación)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                description:
+                  type: string
+                categoryId:
+                  type: integer
+                stock:
+                  type: integer
+                author:
+                  type: string
+                isbn:
+                  type: string
+                publicationYear:
+                  type: integer
+                publisher:
+                  type: string
+                language:
+                  type: string
+                pages:
+                  type: integer
+                format:
+                  type: string
+                  enum: [Tapa blanda, Tapa dura, E-book]
+                tags:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Producto actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Admin - Products
+      summary: Eliminar producto
+      description: Elimina un producto (requiere autenticación)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
