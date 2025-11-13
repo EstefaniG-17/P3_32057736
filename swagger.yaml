@@ -1,14 +1,17 @@
 openapi: 3.0.0
 info:
   title: Maze Runner Books API
+  description: API para gestión de libros de la saga Maze Runner con autenticación JWT
   version: 1.0.0
-  description: API para gestión de libros de Maze Runner - James Dashner
+  contact:
+    name: Estefani González
+    email: estefani@example.com
 
 servers:
-  - url: http://localhost:3000
-    description: Development server
   - url: https://p3-32057736.onrender.com
-    description: Production server
+    description: Servidor de producción
+  - url: http://localhost:3000
+    description: Servidor de desarrollo
 
 components:
   securitySchemes:
@@ -16,208 +19,523 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-  
+      description: JWT token obtenido del endpoint /auth/login
+
   schemas:
-    Product:
-      type: object
-      required:
-        - name
-        - description
-        - price
-        - isbn
-        - publicationYear
-        - publisher
-        - pageCount
-        - coverType
-        - genre
-        - ageRange
-        - categoryId
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        slug:
-          type: string
-        description:
-          type: string
-        price:
-          type: number
-          format: float
-        stock:
-          type: integer
-        isbn:
-          type: string
-        publicationYear:
-          type: integer
-        publisher:
-          type: string
-        edition:
-          type: string
-        language:
-          type: string
-        pageCount:
-          type: integer
-        coverType:
-          type: string
-          enum: [Hardcover, Paperback, E-book]
-        genre:
-          type: string
-        ageRange:
-          type: string
-        categoryId:
-          type: integer
-        tagIds:
-          type: array
-          items:
-            type: integer
-    
-    Category:
+    SuccessResponse:
       type: object
       properties:
-        id:
-          type: integer
-        name:
+        status:
           type: string
-        description:
-          type: string
-    
-    Tag:
+          example: success
+        data:
+          type: object
+          description: Datos de la respuesta
+
+    ErrorResponse:
       type: object
       properties:
-        id:
-          type: integer
-        name:
+        status:
           type: string
-    
+          example: error
+        message:
+          type: string
+          example: Error description
+
     User:
       type: object
       properties:
         id:
           type: integer
+          example: 1
         name:
           type: string
+          example: Juan Pérez
         email:
           type: string
-        password:
+          example: juan@example.com
+        role:
           type: string
+          enum: [admin, user]
+          example: user
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
-tags:
-  - name: Public - Products
-    description: Public product endpoints
-  - name: Admin - Products
-    description: Admin product management endpoints
-  - name: Admin - Categories
-    description: Category management endpoints
-  - name: Admin - Tags
-    description: Tag management endpoints
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Ciencia Ficción
+        description:
+          type: string
+          example: Libros de ciencia ficción y distopía
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Distopía
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Maze Runner - Correr o Morir
+        slug:
+          type: string
+          example: maze-runner-correr-o-morir
+        description:
+          type: string
+          example: Primer libro de la saga Maze Runner
+        price:
+          type: number
+          format: float
+          example: 19.99
+        categoryId:
+          type: integer
+          example: 1
+        image:
+          type: string
+          nullable: true
+        stock:
+          type: integer
+          example: 10
+        # Atributos personalizados para libros
+        author:
+          type: string
+          example: James Dashner
+        isbn:
+          type: string
+          example: "978-8427200581"
+        publicationYear:
+          type: integer
+          example: 2009
+        publisher:
+          type: string
+          example: V&R Editoras
+        language:
+          type: string
+          example: Español
+        pages:
+          type: integer
+          example: 384
+        format:
+          type: string
+          enum: [Tapa blanda, Tapa dura, E-book]
+          example: Tapa blanda
+        isAvailable:
+          type: boolean
+          example: true
+        category:
+          $ref: '#/components/schemas/Category'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AuthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            token:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    ProductSearchResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        pagination:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 15
+            page:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            totalPages:
+              type: integer
+              example: 2
+
+security:
+  - bearerAuth: []
 
 paths:
+  /about:
+    get:
+      tags:
+        - Public
+      summary: Información del desarrollador
+      description: Retorna información personal del desarrollador
+      responses:
+        '200':
+          description: Información obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      nombreCompleto:
+                        type: string
+                        example: Estefani Jeannielys Gonzalez González
+                      cedula:
+                        type: string
+                        example: 32057736
+                      seccion:
+                        type: string
+                        example: 1
+
+  /ping:
+    get:
+      tags:
+        - Public
+      summary: Health check
+      description: Verifica que la API esté funcionando
+      responses:
+        '200':
+          description: API funcionando correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Registrar nuevo usuario
+      description: Crea una nueva cuenta de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  example: Juan Pérez
+                email:
+                  type: string
+                  example: juan@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Iniciar sesión
+      description: Autentica un usuario y retorna un token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: juan@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    get:
+      tags:
+        - Admin - Users
+      summary: Obtener todos los usuarios
+      description: Retorna la lista de todos los usuarios (requiere autenticación)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories:
+    get:
+      tags:
+        - Admin - Categories
+      summary: Obtener todas las categorías
+      description: Retorna la lista de categorías (requiere autenticación)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de categorías obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Admin - Categories
+      summary: Crear nueva categoría
+      description: Crea una nueva categoría (requiere autenticación)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Ciencia Ficción
+                description:
+                  type: string
+                  example: Libros de ciencia ficción
+      responses:
+        '201':
+          description: Categoría creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tags:
+    get:
+      tags:
+        - Admin - Tags
+      summary: Obtener todos los tags
+      description: Retorna la lista de tags (requiere autenticación)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de tags obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /products:
     get:
-      tags: [Public - Products]
-      summary: Search and filter products
-      description: Public endpoint for searching and filtering Maze Runner books with pagination
+      tags:
+        - Public - Products
+      summary: Búsqueda avanzada de productos
+      description: |
+        Busca y filtra productos de forma pública. Incluye paginación y múltiples filtros.
+        
+        **Filtros disponibles:**
+        - `search`: Búsqueda por nombre, descripción o autor
+        - `category`: Filtrar por ID de categoría
+        - `tags`: Filtrar por IDs de tags (separados por coma)
+        - `price_min` y `price_max`: Rango de precios
+        - `author`: Filtrar por autor
+        - `publisher`: Filtrar por editorial
+        - `format`: Filtrar por formato (Tapa blanda, Tapa dura, E-book)
+        - `language`: Filtrar por idioma
+        - `publicationYear`: Filtrar por año de publicación
+        - `available`: Filtrar por disponibilidad (true/false)
+        - `page` y `limit`: Paginación
       parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Término de búsqueda en nombre, descripción o autor
+        - in: query
+          name: category
+          schema:
+            type: integer
+          description: ID de categoría
+        - in: query
+          name: tags
+          schema:
+            type: string
+          description: IDs de tags separados por coma (ej. 1,2,3)
+        - in: query
+          name: price_min
+          schema:
+            type: number
+          description: Precio mínimo
+        - in: query
+          name: price_max
+          schema:
+            type: number
+          description: Precio máximo
+        - in: query
+          name: author
+          schema:
+            type: string
+          description: Filtrar por autor
+        - in: query
+          name: publisher
+          schema:
+            type: string
+          description: Filtrar por editorial
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [Tapa blanda, Tapa dura, E-book]
+          description: Filtrar por formato
+        - in: query
+          name: language
+          schema:
+            type: string
+          description: Filtrar por idioma
+        - in: query
+          name: publicationYear
+          schema:
+            type: integer
+          description: Filtrar por año de publicación
+        - in: query
+          name: available
+          schema:
+            type: boolean
+          description: Filtrar por disponibilidad
         - in: query
           name: page
           schema:
             type: integer
             default: 1
-          description: Page number
+          description: Número de página
         - in: query
           name: limit
           schema:
             type: integer
             default: 10
-          description: Items per page
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search in name and description
-        - in: query
-          name: category
-          schema:
-            type: string
-          description: Category ID or name
-        - in: query
-          name: tags
-          schema:
-            type: string
-          description: Comma-separated tag IDs
-        - in: query
-          name: price_min
-          schema:
-            type: number
-          description: Minimum price
-        - in: query
-          name: price_max
-          schema:
-            type: number
-          description: Maximum price
-        - in: query
-          name: publisher
-          schema:
-            type: string
-          description: Filter by publisher
-        - in: query
-          name: coverType
-          schema:
-            type: string
-            enum: [Hardcover, Paperback, E-book]
-          description: Filter by cover type
-        - in: query
-          name: language
-          schema:
-            type: string
-          description: Filter by language
-        - in: query
-          name: genre
-          schema:
-            type: string
-          description: Filter by genre
-        - in: query
-          name: ageRange
-          schema:
-            type: string
-          description: Filter by age range
-        - in: query
-          name: publicationYear
-          schema:
-            type: integer
-          description: Filter by publication year
+          description: Límite de resultados por página
       responses:
-        200:
-          description: Successful operation
+        '200':
+          description: Búsqueda exitosa
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Product'
-                  pagination:
-                    type: object
-                    properties:
-                      total:
-                        type: integer
-                      page:
-                        type: integer
-                      limit:
-                        type: integer
-                      totalPages:
-                        type: integer
+                $ref: '#/components/schemas/ProductSearchResponse'
 
     post:
-      tags: [Admin - Products]
-      summary: Create a new product
-      description: Create a new Maze Runner book (Admin only)
+      tags:
+        - Admin - Products
+      summary: Crear nuevo producto
+      description: Crea un nuevo producto de libro (requiere autenticación)
       security:
         - bearerAuth: []
       requestBody:
@@ -225,155 +543,126 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              type: object
+              required:
+                - name
+                - price
+                - categoryId
+                - author
+                - isbn
+                - publicationYear
+                - pages
+              properties:
+                name:
+                  type: string
+                  example: Maze Runner - Correr o Morir
+                slug:
+                  type: string
+                  example: maze-runner-correr-o-morir
+                description:
+                  type: string
+                  example: Primer libro de la saga Maze Runner
+                price:
+                  type: number
+                  example: 19.99
+                categoryId:
+                  type: integer
+                  example: 1
+                image:
+                  type: string
+                  nullable: true
+                stock:
+                  type: integer
+                  example: 10
+                author:
+                  type: string
+                  example: James Dashner
+                isbn:
+                  type: string
+                  example: "978-8427200581"
+                publicationYear:
+                  type: integer
+                  example: 2009
+                publisher:
+                  type: string
+                  example: V&R Editoras
+                language:
+                  type: string
+                  example: Español
+                pages:
+                  type: integer
+                  example: 384
+                format:
+                  type: string
+                  enum: [Tapa blanda, Tapa dura, E-book]
+                  example: Tapa blanda
+                tags:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2]
       responses:
-        201:
-          description: Product created successfully
-        401:
-          description: Unauthorized - Invalid or missing token
-
-  /products/{id}:
-    get:
-      tags: [Admin - Products]
-      summary: Get product by ID
-      description: Get a specific product by ID (Admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: Product ID
-      responses:
-        200:
-          description: Product found
+        '201':
+          description: Producto creado exitosamente
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  data:
-                    $ref: '#/components/schemas/Product'
-        404:
-          description: Product not found
-        401:
-          description: Unauthorized
-
-    put:
-      tags: [Admin - Products]
-      summary: Update a product
-      description: Update an existing product (Admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: Product ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
-      responses:
-        200:
-          description: Product updated successfully
-        404:
-          description: Product not found
-        401:
-          description: Unauthorized
-
-    delete:
-      tags: [Admin - Products]
-      summary: Delete a product
-      description: Delete a product (Admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: Product ID
-      responses:
-        200:
-          description: Product deleted successfully
-        404:
-          description: Product not found
-        401:
-          description: Unauthorized
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /p/{id}-{slug}:
     get:
-      tags: [Public - Products]
-      summary: Get product by ID and slug (Self-healing URL)
-      description: Public endpoint with self-healing capability - redirects if slug is incorrect
+      tags:
+        - Public - Products
+      summary: Obtener producto por URL amigable
+      description: |
+        Obtiene un producto por su ID y slug. Incluye funcionalidad de "self-healing":
+        si el slug no coincide con el actual, redirige automáticamente a la URL correcta.
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
-          description: Product ID
+          description: ID del producto
         - in: path
           name: slug
           required: true
           schema:
             type: string
-          description: Product slug
+          description: Slug del producto (para URLs amigables)
       responses:
-        200:
-          description: Product found
-        301:
-          description: Redirect to correct URL
-        404:
-          description: Product not found
+        '200':
+          description: Producto obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '301':
+          description: Redirección a la URL correcta (self-healing)
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL correcta del producto
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-  /categories:
+  /products/{id}:
     get:
-      tags: [Admin - Categories]
-      summary: Get all categories
-      description: Get all categories (Admin only)
-      security:
-        - bearerAuth: []
-      responses:
-        200:
-          description: Categories retrieved successfully
-        401:
-          description: Unauthorized
-
-    post:
-      tags: [Admin - Categories]
-      summary: Create a new category
-      description: Create a new category (Admin only)
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Category'
-      responses:
-        201:
-          description: Category created successfully
-        401:
-          description: Unauthorized
-
-  /categories/{id}:
-    get:
-      tags: [Admin - Categories]
-      summary: Get category by ID
-      description: Get a specific category by ID (Admin only)
+      tags:
+        - Admin - Products
+      summary: Obtener producto por ID (admin)
+      description: Obtiene un producto por su ID para administración (requiere autenticación)
       security:
         - bearerAuth: []
       parameters:
@@ -382,19 +671,32 @@ paths:
           required: true
           schema:
             type: integer
-          description: Category ID
+          description: ID del producto
       responses:
-        200:
-          description: Category found
-        404:
-          description: Category not found
-        401:
-          description: Unauthorized
+        '200':
+          description: Producto obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
     put:
-      tags: [Admin - Categories]
-      summary: Update a category
-      description: Update an existing category (Admin only)
+      tags:
+        - Admin - Products
+      summary: Actualizar producto
+      description: Actualiza un producto existente (requiere autenticación)
       security:
         - bearerAuth: []
       parameters:
@@ -403,25 +705,62 @@ paths:
           required: true
           schema:
             type: integer
-          description: Category ID
+          description: ID del producto
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                description:
+                  type: string
+                categoryId:
+                  type: integer
+                stock:
+                  type: integer
+                author:
+                  type: string
+                isbn:
+                  type: string
+                publicationYear:
+                  type: integer
+                publisher:
+                  type: string
+                language:
+                  type: string
+                pages:
+                  type: integer
+                format:
+                  type: string
+                  enum: [Tapa blanda, Tapa dura, E-book]
+                tags:
+                  type: array
+                  items:
+                    type: integer
       responses:
-        200:
-          description: Category updated successfully
-        404:
-          description: Category not found
-        401:
-          description: Unauthorized
+        '200':
+          description: Producto actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
     delete:
-      tags: [Admin - Categories]
-      summary: Delete a category
-      description: Delete a category (Admin only)
+      tags:
+        - Admin - Products
+      summary: Eliminar producto
+      description: Elimina un producto (requiere autenticación)
       security:
         - bearerAuth: []
       parameters:
@@ -430,112 +769,17 @@ paths:
           required: true
           schema:
             type: integer
-          description: Category ID
+          description: ID del producto
       responses:
-        200:
-          description: Category deleted successfully
-        404:
-          description: Category not found
-        401:
-          description: Unauthorized
-
-  /tags:
-    get:
-      tags: [Admin - Tags]
-      summary: Get all tags
-      description: Get all tags (Admin only)
-      security:
-        - bearerAuth: []
-      responses:
-        200:
-          description: Tags retrieved successfully
-        401:
-          description: Unauthorized
-
-    post:
-      tags: [Admin - Tags]
-      summary: Create a new tag
-      description: Create a new tag (Admin only)
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Tag'
-      responses:
-        201:
-          description: Tag created successfully
-        401:
-          description: Unauthorized
-
-  /tags/{id}:
-    get:
-      tags: [Admin - Tags]
-      summary: Get tag by ID
-      description: Get a specific tag by ID (Admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: Tag ID
-      responses:
-        200:
-          description: Tag found
-        404:
-          description: Tag not found
-        401:
-          description: Unauthorized
-
-    put:
-      tags: [Admin - Tags]
-      summary: Update a tag
-      description: Update an existing tag (Admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: Tag ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Tag'
-      responses:
-        200:
-          description: Tag updated successfully
-        404:
-          description: Tag not found
-        401:
-          description: Unauthorized
-
-    delete:
-      tags: [Admin - Tags]
-      summary: Delete a tag
-      description: Delete a tag (Admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: Tag ID
-      responses:
-        200:
-          description: Tag deleted successfully
-        404:
-          description: Tag not found
-        401:
-          description: Unauthorized
+        '200':
+          description: Producto eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

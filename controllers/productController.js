@@ -1,6 +1,7 @@
 const { Product, Category, Tag, sequelize } = require('../models');
 const ProductRepository = require('../repositories/ProductRepository');
 
+// ✅ USAR REPOSITORY PATTERN
 const productRepository = new ProductRepository({ Product, Category, Tag }, sequelize);
 
 const productController = {
@@ -35,20 +36,9 @@ const productController = {
         });
       }
 
-      // ✅ SELF-HEALING: Redirigir si el slug es incorrecto
+      // ✅ SELF-HEALING: Redirección 301 real
       if (product.slug !== slug) {
-        return res.status(301).json({
-          status: 'redirect',
-          message: 'Product slug has changed',
-          data: {
-            correctUrl: `/p/${id}-${product.slug}`,
-            product: {
-              id: product.id,
-              name: product.name,
-              slug: product.slug
-            }
-          }
-        });
+        return res.redirect(301, `/p/${id}-${product.slug}`);
       }
 
       res.json({

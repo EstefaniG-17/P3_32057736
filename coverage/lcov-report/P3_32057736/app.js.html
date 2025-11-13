@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.9% </span>
+                <span class="strong">88.57% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>30/33</span>
+                <span class='fraction'>31/35</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.9% </span>
+                <span class="strong">88.57% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>30/33</span>
+                <span class='fraction'>31/35</span>
             </div>
         
             
@@ -187,7 +187,16 @@
 <a name='L122'></a><a href='#L122'>122</a>
 <a name='L123'></a><a href='#L123'>123</a>
 <a name='L124'></a><a href='#L124'>124</a>
-<a name='L125'></a><a href='#L125'>125</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -239,10 +248,6 @@
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -271,9 +276,16 @@
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -306,6 +318,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -363,11 +381,7 @@ const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const path = require('path');
 const app = express();
-// Cargar el archivo YAML
 const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));
-&nbsp;
-// Configurar Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Nota: la sincronización de la base de datos se realiza en el binario (./bin/www)
 // para evitar efectos secundarios cuando `app` es requerido por tests.
 &nbsp;
@@ -386,19 +400,26 @@ app.use('/tags', require('./routes/tags'));
 const productController = require('./controllers/productController');
 app.get('/p/:id-:slug', productController.getBySlug);
 &nbsp;
-// Swagger
-try {
-  const fs = require('fs');
-  const swaggerPath = './swagger.yaml';
-  if (fs.existsSync(swaggerPath)) {
-    const swaggerDocument = YAML.load(swaggerPath);
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-  } else <span class="missing-if-branch" title="else path not taken" >E</span>{
-<span class="cstat-no" title="statement not covered" >    console.log('No swagger.yaml found — /api-docs disabled');</span>
+// Swagger: preferir el archivo YAML si existe, si no usar 'specs' generados
+const fs = require('fs');
+const swaggerPath = path.join(__dirname, 'swagger.yaml');
+let swaggerDocToUse = null;
+if (fs.existsSync(swaggerPath)) {
+  try {
+    swaggerDocToUse = YAML.load(swaggerPath);
+  } catch (e) {
+<span class="cstat-no" title="statement not covered" >    console.warn('Could not load swagger.yaml, falling back to specs from config:', e.message || e);</span>
+<span class="cstat-no" title="statement not covered" >    swaggerDocToUse = specs;</span>
   }
-} catch (error) {
-<span class="cstat-no" title="statement not covered" >  console.log('Error loading swagger documentation:', error.message || error);</span>
+} else <span class="missing-if-branch" title="else path not taken" >E</span>{
+<span class="cstat-no" title="statement not covered" >  swaggerDocToUse = specs;</span>
 }
+&nbsp;
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocToUse, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "Maze Runner Books API Documentation"
+}));
 &nbsp;
 // Health check
 app.get('/ping', (req, res) =&gt; {
@@ -434,6 +455,12 @@ app.use('*', (req, res) =&gt; {
     message: 'Route not found'
   });
 });
+&nbsp;
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "Maze Runner Books API Documentation"
+}));
 module.exports = app;
 &nbsp;</pre></td></tr></table></pre>
 
@@ -442,7 +469,7 @@ module.exports = app;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-13T03:56:57.907Z
+                at 2025-11-13T04:25:14.481Z
             </div>
         <script src="../prettify.js"></script>
         <script>

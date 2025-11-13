@@ -125,11 +125,20 @@ class ProductQueryBuilder {
   }
 
   async execute() {
-    const products = await this.Product.findAll(this.queryOptions);
-    const total = await this.Product.count({
+    // Clonar options para count (sin paginación)
+    const countOptions = {
       where: this.queryOptions.where,
-      include: this.queryOptions.include.filter(inc => !inc.where) // Excluir includes con where (para tags)
+      include: [...this.queryOptions.include]
+    };
+
+    // Remover where de includes para count
+    countOptions.include = countOptions.include.map(include => {
+      const { where, ...rest } = include;
+      return rest;
     });
+
+    const products = await this.Product.findAll(this.queryOptions);
+    const total = await this.Product.count(countOptions);
 
     return {
       products,

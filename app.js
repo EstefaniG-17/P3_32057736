@@ -50,11 +50,7 @@ const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const path = require('path');
 const app = express();
-// Cargar el archivo YAML
 const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));
-
-// Configurar Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Nota: la sincronización de la base de datos se realiza en el binario (./bin/www)
 // para evitar efectos secundarios cuando `app` es requerido por tests.
 
@@ -73,19 +69,26 @@ app.use('/tags', require('./routes/tags'));
 const productController = require('./controllers/productController');
 app.get('/p/:id-:slug', productController.getBySlug);
 
-// Swagger
-try {
-  const fs = require('fs');
-  const swaggerPath = './swagger.yaml';
-  if (fs.existsSync(swaggerPath)) {
-    const swaggerDocument = YAML.load(swaggerPath);
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-  } else {
-    console.log('No swagger.yaml found — /api-docs disabled');
+// Swagger: preferir el archivo YAML si existe, si no usar 'specs' generados
+const fs = require('fs');
+const swaggerPath = path.join(__dirname, 'swagger.yaml');
+let swaggerDocToUse = null;
+if (fs.existsSync(swaggerPath)) {
+  try {
+    swaggerDocToUse = YAML.load(swaggerPath);
+  } catch (e) {
+    console.warn('Could not load swagger.yaml, falling back to specs from config:', e.message || e);
+    swaggerDocToUse = specs;
   }
-} catch (error) {
-  console.log('Error loading swagger documentation:', error.message || error);
+} else {
+  swaggerDocToUse = specs;
 }
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocToUse, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "Maze Runner Books API Documentation"
+}));
 
 // Health check
 app.get('/ping', (req, res) => {
@@ -121,4 +124,10 @@ app.use('*', (req, res) => {
     message: 'Route not found'
   });
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "Maze Runner Books API Documentation"
+}));
 module.exports = app;
