@@ -1,16 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
-const auth = require('../middleware/auth');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// ✅ RUTAS PÚBLICAS
-router.get('/', productController.search); // Búsqueda avanzada con filtros
-router.get('/p/:id-:slug', productController.getBySlug); // Self-healing URL
+// RUTAS PÚBLICAS
+router.get('/', productController.getPublicProducts);
+router.get('/p/:id-:slug', productController.getProductBySlug);
 
-// ✅ RUTAS PROTEGIDAS
-router.post('/', auth, productController.create);
-router.get('/:id', auth, productController.getById); // Para administración
-router.put('/:id', auth, productController.update);
-router.delete('/:id', auth, productController.delete);
+// RUTAS PROTEGIDAS
+router.use(authMiddleware);
+router.get('/admin', productController.getAll); // Para administradores
+router.get('/:id', productController.getById);
+router.post('/', productController.create);
+router.put('/:id', productController.update);
+router.delete('/:id', productController.delete);
 
 module.exports = router;

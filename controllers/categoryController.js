@@ -1,127 +1,67 @@
-const { Category, Product } = require('../models');
+const db = require('../models');
+const { Category } = db;
+const responseHelper = require('../helpers/responseHelper');
 
 const categoryController = {
-  getAll: async (req, res) => {
+  async getAll(req, res) {
     try {
       const categories = await Category.findAll();
-      res.json({
-        status: 'success',
-        data: categories
-      });
+      responseHelper.success(res, categories);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   },
 
-  getById: async (req, res) => {
+  async getById(req, res) {
     try {
-      const { id } = req.params;
-      const category = await Category.findByPk(id);
-
+      const category = await Category.findByPk(req.params.id);
       if (!category) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Category not found'
-        });
+        return responseHelper.fail(res, 'Category not found');
       }
-
-      res.json({
-        status: 'success',
-        data: category
-      });
+      responseHelper.success(res, category);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   },
 
-  create: async (req, res) => {
+  async create(req, res) {
     try {
       const { name, description } = req.body;
-      
-      if (!name) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'Name is required'
-        });
-      }
-
       const category = await Category.create({ name, description });
-      res.status(201).json({
-        status: 'success',
-        data: category
-      });
+      responseHelper.success(res, category, 'Category created successfully', 201);
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   },
 
-  update: async (req, res) => {
+  async update(req, res) {
     try {
-      const { id } = req.params;
-      const { name, description } = req.body;
-
-      const category = await Category.findByPk(id);
+      const category = await Category.findByPk(req.params.id);
       if (!category) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Category not found'
-        });
+        return responseHelper.fail(res, 'Category not found');
       }
-
-      await category.update({ name, description });
       
-      res.json({
-        status: 'success',
-        data: category
-      });
+      await category.update(req.body);
+      responseHelper.success(res, category, 'Category updated successfully');
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   },
 
-  delete: async (req, res) => {
+  async delete(req, res) {
     try {
-      const { id } = req.params;
-      const category = await Category.findByPk(id);
-
+      const category = await Category.findByPk(req.params.id);
       if (!category) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Category not found'
-        });
+        return responseHelper.fail(res, 'Category not found');
       }
-
-      // Eliminar productos relacionados para evitar errores de integridad
-      try {
-        await Product.destroy({ where: { categoryId: id } });
-      } catch (e) {
-        // Si falla, loguear y continuar intentando borrar la categoría
-        console.warn('Could not delete related products:', e.message || e);
+      // Eliminar productos relacionados primero para evitar errores por FK
+      if (db.Product) {
+        await db.Product.destroy({ where: { categoryId: category.id } });
       }
-
       await category.destroy();
-
-      res.json({
-        status: 'success',
-        message: 'Category deleted successfully'
-      });
+      responseHelper.success(res, null, 'Category deleted successfully');
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   }
 };

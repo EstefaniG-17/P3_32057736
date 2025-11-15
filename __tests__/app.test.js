@@ -38,4 +38,54 @@ describe('Basic Endpoints', () => {
       expect(response.body.status).toBe('error');
     });
   });
+
+  // ... pruebas existentes ...
+
+describe('Categories API', () => {
+  let token;
+
+  beforeAll(async () => {
+    // Login para obtener token
+    const res = await request(app)
+      .post('/api/users/login')
+      .send({ 
+        email: 'test@example.com', 
+        password: 'password123' 
+      });
+    token = res.body.data.token;
+  });
+
+  it('should create a category', async () => {
+    const res = await request(app)
+      .post('/api/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ 
+        name: 'Video Games', 
+        description: 'All video games' 
+      });
+    expect(res.statusCode).toEqual(201);
+    expect(res.body.data.name).toEqual('Video Games');
+  });
+
+  it('should not create category without auth', async () => {
+    const res = await request(app)
+      .post('/api/categories')
+      .send({ name: 'Test' });
+    expect(res.statusCode).toEqual(401);
+  });
+});
+
+describe('Products API', () => {
+  it('should get public products', async () => {
+    const res = await request(app)
+      .get('/api/products');
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('should filter products by platform', async () => {
+    const res = await request(app)
+      .get('/api/products?platform=PS5');
+    expect(res.statusCode).toEqual(200);
+  });
+});
 });
