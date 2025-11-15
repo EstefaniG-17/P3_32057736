@@ -11,6 +11,7 @@ const productController = {
       const pagination = result.pagination || null;
       responseHelper.success(res, products, null, 200, { pagination });
     } catch (error) {
+      console.error('getPublicProducts error:', error);
       responseHelper.error(res, error.message);
     }
   },
@@ -31,6 +32,7 @@ const productController = {
 
       responseHelper.success(res, product);
     } catch (error) {
+      console.error('getProductBySlug error:', error);
       responseHelper.error(res, error.message);
     }
   },
@@ -41,6 +43,7 @@ const productController = {
       const products = await productRepository.findAll();
       responseHelper.success(res, products);
     } catch (error) {
+      console.error('getAll products error:', error);
       responseHelper.error(res, error.message);
     }
   },
@@ -53,6 +56,7 @@ const productController = {
       }
       responseHelper.success(res, product);
     } catch (error) {
+      console.error('getById product error:', error);
       responseHelper.error(res, error.message);
     }
   },
@@ -62,6 +66,7 @@ const productController = {
       const product = await productRepository.create(req.body);
       responseHelper.success(res, product, 'Product created successfully', 201);
     } catch (error) {
+      console.error('create product error:', error);
       responseHelper.error(res, error.message);
     }
   },
@@ -74,6 +79,7 @@ const productController = {
       }
       responseHelper.success(res, product, 'Product updated successfully');
     } catch (error) {
+      console.error('update product error:', error);
       responseHelper.error(res, error.message);
     }
   },
@@ -86,6 +92,7 @@ const productController = {
       }
       responseHelper.success(res, null, 'Product deleted successfully');
     } catch (error) {
+      console.error('delete product error:', error);
       responseHelper.error(res, error.message);
     }
   }

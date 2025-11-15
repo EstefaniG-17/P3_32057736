@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1763234585974" clover="3.2.0">
-  <project timestamp="1763234585975" name="All files">
-    <metrics statements="581" coveredstatements="312" conditionals="248" coveredconditionals="99" methods="88" coveredmethods="38" elements="917" coveredelements="449" complexity="0" loc="581" ncloc="581" packages="10" files="29" classes="29"/>
+<coverage generated="1763235963347" clover="3.2.0">
+  <project timestamp="1763235963348" name="All files">
+    <metrics statements="603" coveredstatements="319" conditionals="277" coveredconditionals="111" methods="92" coveredmethods="42" elements="972" coveredelements="472" complexity="0" loc="603" ncloc="603" packages="10" files="29" classes="29"/>
     <package name="P3_32057736">
       <metrics statements="62" coveredstatements="36" conditionals="14" coveredconditionals="1" methods="9" coveredmethods="3"/>
       <file name="app.js" path="C:\Users\Usuario\Documents\GitHub\P3_32057736\app.js">
@@ -89,7 +89,7 @@
       </file>
     </package>
     <package name="P3_32057736.controllers">
-      <metrics statements="191" coveredstatements="89" conditionals="72" coveredconditionals="32" methods="24" coveredmethods="11"/>
+      <metrics statements="198" coveredstatements="89" conditionals="72" coveredconditionals="32" methods="24" coveredmethods="11"/>
       <file name="authController.js" path="C:\Users\Usuario\Documents\GitHub\P3_32057736\controllers\authController.js">
         <metrics statements="35" coveredstatements="28" conditionals="25" coveredconditionals="15" methods="2" coveredmethods="2"/>
         <line num="1" count="5" type="stmt"/>
@@ -168,7 +168,7 @@
         <line num="69" count="5" type="stmt"/>
       </file>
       <file name="productController.js" path="C:\Users\Usuario\Documents\GitHub\P3_32057736\controllers\productController.js">
-        <metrics statements="45" coveredstatements="19" conditionals="14" coveredconditionals="5" methods="7" coveredmethods="3"/>
+        <metrics statements="52" coveredstatements="19" conditionals="14" coveredconditionals="5" methods="7" coveredmethods="3"/>
         <line num="1" count="5" type="stmt"/>
         <line num="2" count="5" type="stmt"/>
         <line num="4" count="5" type="stmt"/>
@@ -178,42 +178,49 @@
         <line num="11" count="8" type="cond" truecount="1" falsecount="1"/>
         <line num="12" count="8" type="stmt"/>
         <line num="14" count="0" type="stmt"/>
-        <line num="19" count="2" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
         <line num="20" count="2" type="stmt"/>
         <line num="21" count="2" type="stmt"/>
-        <line num="23" count="2" type="cond" truecount="1" falsecount="1"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="28" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="29" count="1" type="stmt"/>
-        <line num="32" count="1" type="stmt"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
+        <line num="22" count="2" type="stmt"/>
+        <line num="24" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="29" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="33" count="1" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
         <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
         <line num="44" count="0" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
-        <line num="51" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
         <line num="52" count="0" type="stmt"/>
-        <line num="54" count="0" type="stmt"/>
-        <line num="56" count="0" type="stmt"/>
-        <line num="61" count="1" type="stmt"/>
-        <line num="62" count="1" type="stmt"/>
-        <line num="63" count="1" type="stmt"/>
-        <line num="65" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="65" count="1" type="stmt"/>
+        <line num="66" count="1" type="stmt"/>
+        <line num="67" count="1" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
         <line num="70" count="0" type="stmt"/>
-        <line num="71" count="0" type="stmt"/>
-        <line num="72" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="73" count="0" type="stmt"/>
         <line num="75" count="0" type="stmt"/>
-        <line num="77" count="0" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="77" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="78" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
         <line num="82" count="0" type="stmt"/>
         <line num="83" count="0" type="stmt"/>
-        <line num="84" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="85" count="0" type="stmt"/>
-        <line num="87" count="0" type="stmt"/>
+        <line num="88" count="0" type="stmt"/>
         <line num="89" count="0" type="stmt"/>
-        <line num="94" count="5" type="stmt"/>
+        <line num="90" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="91" count="0" type="stmt"/>
+        <line num="93" count="0" type="stmt"/>
+        <line num="95" count="0" type="stmt"/>
+        <line num="96" count="0" type="stmt"/>
+        <line num="101" count="5" type="stmt"/>
       </file>
       <file name="tagController.js" path="C:\Users\Usuario\Documents\GitHub\P3_32057736\controllers\tagController.js">
         <metrics statements="33" coveredstatements="4" conditionals="6" coveredconditionals="0" methods="5" coveredmethods="0"/>
@@ -440,9 +447,9 @@
       </file>
     </package>
     <package name="P3_32057736.repositories">
-      <metrics statements="34" coveredstatements="21" conditionals="44" coveredconditionals="23" methods="7" coveredmethods="3"/>
+      <metrics statements="34" coveredstatements="21" conditionals="44" coveredconditionals="24" methods="7" coveredmethods="3"/>
       <file name="ProductRepository.js" path="C:\Users\Usuario\Documents\GitHub\P3_32057736\repositories\ProductRepository.js">
-        <metrics statements="34" coveredstatements="21" conditionals="44" coveredconditionals="23" methods="7" coveredmethods="3"/>
+        <metrics statements="34" coveredstatements="21" conditionals="44" coveredconditionals="24" methods="7" coveredmethods="3"/>
         <line num="1" count="5" type="stmt"/>
         <line num="2" count="5" type="stmt"/>
         <line num="6" count="0" type="stmt"/>
@@ -471,7 +478,7 @@
         <line num="73" count="8" type="cond" truecount="2" falsecount="0"/>
         <line num="74" count="8" type="cond" truecount="2" falsecount="0"/>
         <line num="75" count="8" type="cond" truecount="2" falsecount="0"/>
-        <line num="77" count="8" type="cond" truecount="3" falsecount="1"/>
+        <line num="77" count="8" type="cond" truecount="4" falsecount="0"/>
         <line num="78" count="8" type="cond" truecount="1" falsecount="3"/>
         <line num="79" count="8" type="cond" truecount="1" falsecount="3"/>
         <line num="80" count="8" type="cond" truecount="1" falsecount="3"/>
@@ -594,64 +601,79 @@
       </file>
     </package>
     <package name="P3_32057736.services">
-      <metrics statements="95" coveredstatements="38" conditionals="54" coveredconditionals="11" methods="26" coveredmethods="9"/>
+      <metrics statements="110" coveredstatements="45" conditionals="83" coveredconditionals="22" methods="30" coveredmethods="13"/>
       <file name="ProductQueryBuilder.js" path="C:\Users\Usuario\Documents\GitHub\P3_32057736\services\ProductQueryBuilder.js">
-        <metrics statements="55" coveredstatements="27" conditionals="34" coveredconditionals="8" methods="17" coveredmethods="7"/>
+        <metrics statements="70" coveredstatements="34" conditionals="63" coveredconditionals="19" methods="21" coveredmethods="11"/>
         <line num="1" count="5" type="stmt"/>
-        <line num="5" count="8" type="stmt"/>
+        <line num="2" count="5" type="stmt"/>
         <line num="6" count="8" type="stmt"/>
-        <line num="7" count="8" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
+        <line num="26" count="1" type="cond" truecount="3" falsecount="0"/>
+        <line num="30" count="0" type="stmt"/>
         <line num="31" count="0" type="stmt"/>
-        <line num="35" count="1" type="cond" truecount="2" falsecount="2"/>
-        <line num="36" count="1" type="stmt"/>
-        <line num="37" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="38" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="40" count="1" type="stmt"/>
-        <line num="44" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="37" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="38" count="0" type="stmt"/>
         <line num="45" count="0" type="stmt"/>
-        <line num="47" count="0" type="stmt"/>
-        <line num="51" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="52" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="49" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="50" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="51" count="0" type="stmt"/>
         <line num="53" count="0" type="stmt"/>
-        <line num="57" count="0" type="stmt"/>
-        <line num="62" count="0" type="stmt"/>
+        <line num="57" count="1" type="cond" truecount="2" falsecount="2"/>
+        <line num="58" count="1" type="stmt"/>
+        <line num="59" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="60" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="62" count="1" type="stmt"/>
         <line num="66" count="1" type="cond" truecount="1" falsecount="1"/>
         <line num="67" count="1" type="stmt"/>
-        <line num="73" count="1" type="stmt"/>
-        <line num="78" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="79" count="1" type="stmt"/>
+        <line num="72" count="1" type="stmt"/>
+        <line num="76" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="77" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="78" count="0" type="stmt"/>
         <line num="81" count="1" type="stmt"/>
-        <line num="85" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="86" count="1" type="stmt"/>
-        <line num="88" count="1" type="stmt"/>
-        <line num="92" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="93" count="1" type="stmt"/>
-        <line num="95" count="1" type="stmt"/>
-        <line num="99" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="100" count="0" type="stmt"/>
-        <line num="102" count="0" type="stmt"/>
-        <line num="106" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="107" count="0" type="stmt"/>
-        <line num="109" count="0" type="stmt"/>
-        <line num="113" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="114" count="0" type="stmt"/>
-        <line num="116" count="0" type="stmt"/>
-        <line num="120" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="121" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="122" count="0" type="stmt"/>
-        <line num="123" count="0" type="stmt"/>
-        <line num="124" count="0" type="stmt"/>
-        <line num="129" count="8" type="stmt"/>
-        <line num="135" count="8" type="stmt"/>
-        <line num="136" count="0" type="stmt"/>
-        <line num="137" count="0" type="stmt"/>
-        <line num="140" count="8" type="stmt"/>
-        <line num="141" count="8" type="stmt"/>
-        <line num="143" count="8" type="stmt"/>
-        <line num="155" count="5" type="stmt"/>
+        <line num="85" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="86" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="90" count="0" type="stmt"/>
+        <line num="94" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="95" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="96" count="0" type="stmt"/>
+        <line num="99" count="0" type="stmt"/>
+        <line num="103" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="104" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="105" count="0" type="stmt"/>
+        <line num="108" count="0" type="stmt"/>
+        <line num="112" count="8" type="stmt"/>
+        <line num="116" count="8" type="stmt"/>
+        <line num="117" count="8" type="cond" truecount="1" falsecount="1"/>
+        <line num="118" count="8" type="cond" truecount="1" falsecount="5"/>
+        <line num="120" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="121" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="122" count="8" type="stmt"/>
+        <line num="124" count="8" type="stmt"/>
+        <line num="138" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="139" count="1" type="stmt"/>
+        <line num="141" count="1" type="stmt"/>
+        <line num="145" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="146" count="1" type="stmt"/>
+        <line num="148" count="1" type="stmt"/>
+        <line num="152" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="153" count="0" type="stmt"/>
+        <line num="155" count="0" type="stmt"/>
+        <line num="159" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="160" count="0" type="stmt"/>
+        <line num="162" count="0" type="stmt"/>
+        <line num="166" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="167" count="0" type="stmt"/>
+        <line num="169" count="0" type="stmt"/>
+        <line num="173" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="174" count="0" type="stmt"/>
+        <line num="176" count="0" type="stmt"/>
+        <line num="181" count="1" type="stmt"/>
+        <line num="185" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="186" count="1" type="stmt"/>
+        <line num="188" count="1" type="stmt"/>
+        <line num="192" count="5" type="stmt"/>
       </file>
       <file name="authService.js" path="C:\Users\Usuario\Documents\GitHub\P3_32057736\services\authService.js">
         <metrics statements="17" coveredstatements="4" conditionals="8" coveredconditionals="1" methods="4" coveredmethods="1"/>
