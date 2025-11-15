@@ -1,56 +1,33 @@
-// const express = require('express');
-// const path = require('path');
-// const logger = require('morgan');
-// const cors = require('cors');
-
-// const app = express();
-
-// // Middlewares
-// app.use(logger('dev'));
-// app.use(cors());
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
-// app.use(express.static(path.join(__dirname, 'public')));
-
-// // ✅ IMPORTAR Y CONFIGURAR RUTAS CORRECTAMENTE
-// app.use('/auth', require('./routes/auth'));
-// app.use('/users', require('./routes/users'));
-// app.use('/categories', require('./routes/categories'));
-// app.use('/products', require('./routes/products'));
-// app.use('/tags', require('./routes/tags'));
-
-// // Ruta de prueba básica
-// app.get('/', (req, res) => {
-//   res.json({ message: 'API funcionando' });
-// });
-
-// // Manejo de errores 404
-// app.use((req, res, next) => {
-//   res.status(404).json({
-//     status: 'error',
-//     message: 'Ruta no encontrada'
-//   });
-// });
-
-// // Manejo de errores general
-// app.use((error, req, res, next) => {
-//   console.error('Error:', error);
-//   res.status(500).json({
-//     status: 'error',
-//     message: 'Error interno del servidor'
-//   });
-// });
-
-// module.exports = app;
-
-// app.js
 require('dotenv').config();
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const path = require('path');
 const app = express();
-const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));
+
+// Cargar spec preferentemente desde `swagger.yaml`, si no existe intentar
+// cargar `./config/swagger.js` (swagger-jsdoc) y, si tampoco, dejar vacío.
+let swaggerDocToUse = {};
+try {
+  const yamlPath = path.join(__dirname, 'swagger.yaml');
+  if (require('fs').existsSync(yamlPath)) {
+    swaggerDocToUse = YAML.load(yamlPath);
+    console.log('Using swagger.yaml for /api-docs');
+  } else {
+    // intentar cargar config/swagger.js si existe
+    try {
+      const swaggerCfg = require('./config/swagger');
+      swaggerDocToUse = swaggerCfg && swaggerCfg.specs ? swaggerCfg.specs : {};
+      console.log('Using swagger-jsdoc specs for /api-docs');
+    } catch (e) {
+      console.log('No swagger.yaml or config/swagger.js found — /api-docs will be empty');
+      swaggerDocToUse = {};
+    }
+  }
+} catch (e) {
+  console.warn('Error loading swagger spec:', e.message || e);
+  swaggerDocToUse = {};
+}
 // Nota: la sincronización de la base de datos se realiza en el binario (./bin/www)
 // para evitar efectos secundarios cuando `app` es requerido por tests.
 
@@ -69,20 +46,10 @@ app.use('/tags', require('./routes/tags'));
 const productController = require('./controllers/productController');
 app.get('/p/:id-:slug', productController.getBySlug);
 
-// Swagger: preferir el archivo YAML si existe, si no usar 'specs' generados
-const fs = require('fs');
-const swaggerPath = path.join(__dirname, 'swagger.yaml');
-let swaggerDocToUse = null;
-if (fs.existsSync(swaggerPath)) {
-  try {
-    swaggerDocToUse = YAML.load(swaggerPath);
-  } catch (e) {
-    console.warn('Could not load swagger.yaml, falling back to specs from config:', e.message || e);
-    swaggerDocToUse = specs;
-  }
-} else {
-  swaggerDocToUse = specs;
-}
+// Endpoint para inspeccionar el spec consumido por Swagger UI
+app.get('/api-docs.json', (req, res) => {
+  res.json(swaggerDocToUse);
+});
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocToUse, {
   explorer: true,
@@ -125,9 +92,5 @@ app.use('*', (req, res) => {
   });
 });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
-  explorer: true,
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "Maze Runner Books API Documentation"
-}));
+// (no additional /api-docs setup)
 module.exports = app;

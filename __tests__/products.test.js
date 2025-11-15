@@ -169,4 +169,35 @@ describe('Products API - Maze Runner Books', () => {
       expect([200, 500]).toContain(res.statusCode);
     });
   });
+
+  describe('Admin Users Endpoints', () => {
+  it('should return users list with admin token', async () => {
+    const res = await request(app)
+      .get('/users')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect([200, 500]).toContain(res.statusCode);
+  });
+
+  it('should return 401 when getting users without token', async () => {
+    const res = await request(app).get('/users');
+    expect(res.statusCode).toEqual(401);
+  });
+});
+
+describe('Categories CRUD Endpoints', () => {
+  it('should update category with valid token', async () => {
+    const res = await request(app)
+      .put('/categories/1')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ name: 'Updated Category' });
+    expect([200, 404]).toContain(res.statusCode);
+  });
+
+  it('should delete category with valid token', async () => {
+    const res = await request(app)
+      .delete('/categories/1')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect([200, 404]).toContain(res.statusCode);
+  });
+});
 });
