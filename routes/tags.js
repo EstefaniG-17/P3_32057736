@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const tagController = require('../controllers/tagController');
-const auth = require('../middleware/auth');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// ✅ Todas las rutas requieren autenticación
-router.use(auth);
+// Proteger TODAS las rutas de tags
+router.use(authMiddleware);
 
-// ✅ CRUD COMPLETO para Tags
 router.get('/', tagController.getAll);
 router.get('/:id', tagController.getById);
 router.post('/', tagController.create);

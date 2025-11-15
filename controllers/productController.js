@@ -1,170 +1,99 @@
-const { Product, Category, Tag, sequelize } = require('../models');
-const ProductRepository = require('../repositories/ProductRepository');
-
-// ✅ USAR REPOSITORY PATTERN
-const productRepository = new ProductRepository({ Product, Category, Tag }, sequelize);
+const productRepository = require('../repositories/ProductRepository');
+const responseHelper = require('../helpers/responseHelper');
 
 const productController = {
-  search: async (req, res) => {
+  // RUTAS PÚBLICAS
+  async getPublicProducts(req, res) {
     try {
-      const filters = req.query;
-      const result = await productRepository.findAllWithFilters(filters);
-      
-      res.json({
-        status: 'success',
-        data: result.products,
-        pagination: result.pagination
-      });
+      const result = await productRepository.findAllWithFilters(req.query);
+      // result => { products, pagination }
+      const products = result.products || [];
+      const pagination = result.pagination || null;
+      responseHelper.success(res, products, null, 200, { pagination });
     } catch (error) {
-      console.error('Search error:', error);
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      console.error('getPublicProducts error:', error);
+      responseHelper.error(res, error.message);
     }
   },
 
-  getBySlug: async (req, res) => {
+  async getProductBySlug(req, res) {
     try {
       const { id, slug } = req.params;
       const product = await productRepository.findById(id);
-
+      
       if (!product) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Product not found'
-        });
+        return responseHelper.fail(res, 'Product not found');
       }
 
-      // ✅ SELF-HEALING: Redirección 301 real
+      // Self-healing: si el slug no coincide, redireccionar
       if (product.slug !== slug) {
         return res.redirect(301, `/p/${id}-${product.slug}`);
       }
 
-      res.json({
-        status: 'success',
-        data: product
-      });
+      responseHelper.success(res, product);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      console.error('getProductBySlug error:', error);
+      responseHelper.error(res, error.message);
     }
   },
 
-  getById: async (req, res) => {
+  // RUTAS PROTEGIDAS
+  async getAll(req, res) {
     try {
-      const { id } = req.params;
-      const product = await productRepository.findById(id);
+      const products = await productRepository.findAll();
+      responseHelper.success(res, products);
+    } catch (error) {
+      console.error('getAll products error:', error);
+      responseHelper.error(res, error.message);
+    }
+  },
 
+  async getById(req, res) {
+    try {
+      const product = await productRepository.findById(req.params.id);
       if (!product) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Product not found'
-        });
+        return responseHelper.fail(res, 'Product not found');
       }
-
-      res.json({
-        status: 'success',
-        data: product
-      });
+      responseHelper.success(res, product);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      console.error('getById product error:', error);
+      responseHelper.error(res, error.message);
     }
   },
 
-  create: async (req, res) => {
+  async create(req, res) {
     try {
-      const productData = {
-        ...req.body,
-        // Generar slug si no viene
-        slug: req.body.slug || req.body.name.toLowerCase().replace(/\s+/g, '-')
-      };
-
-      const product = await productRepository.create(productData);
-      
-      // Si hay tags, asociarlos
-      if (req.body.tags && Array.isArray(req.body.tags)) {
-        await product.setTags(req.body.tags);
-      }
-
-      const productWithRelations = await productRepository.findById(product.id);
-
-      res.status(201).json({
-        status: 'success',
-        data: productWithRelations
-      });
+      const product = await productRepository.create(req.body);
+      responseHelper.success(res, product, 'Product created successfully', 201);
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        message: error.message
-      });
+      console.error('create product error:', error);
+      responseHelper.error(res, error.message);
     }
   },
 
-  update: async (req, res) => {
+  async update(req, res) {
     try {
-      const { id } = req.params;
-      const productData = { ...req.body };
-
-      // Generar nuevo slug si el nombre cambió
-      if (req.body.name && !req.body.slug) {
-        productData.slug = req.body.name.toLowerCase().replace(/\s+/g, '-');
-      }
-
-      const product = await productRepository.update(id, productData);
-      
+      const product = await productRepository.update(req.params.id, req.body);
       if (!product) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Product not found'
-        });
+        return responseHelper.fail(res, 'Product not found');
       }
-
-      // Actualizar tags si vienen en la request
-      if (req.body.tags && Array.isArray(req.body.tags)) {
-        await product.setTags(req.body.tags);
-      }
-
-      const productWithRelations = await productRepository.findById(id);
-
-      res.json({
-        status: 'success',
-        data: productWithRelations
-      });
+      responseHelper.success(res, product, 'Product updated successfully');
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        message: error.message
-      });
+      console.error('update product error:', error);
+      responseHelper.error(res, error.message);
     }
   },
 
-  delete: async (req, res) => {
+  async delete(req, res) {
     try {
-      const { id } = req.params;
-      const result = await productRepository.delete(id);
-
-      if (!result) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Product not found'
-        });
+      const success = await productRepository.delete(req.params.id);
+      if (!success) {
+        return responseHelper.fail(res, 'Product not found');
       }
-
-      res.json({
-        status: 'success',
-        message: 'Product deleted successfully'
-      });
+      responseHelper.success(res, null, 'Product deleted successfully');
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      console.error('delete product error:', error);
+      responseHelper.error(res, error.message);
     }
   }
 };

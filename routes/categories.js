@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const categoryController = require('../controllers/categoryController');
-const auth = require('../middleware/auth');
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.use(auth); // ✅ Todas protegidas
+// Proteger TODAS las rutas de categories
+router.use(authMiddleware);
 
-// ✅ CRUD COMPLETO
 router.get('/', categoryController.getAll);
 router.get('/:id', categoryController.getById);
 router.post('/', categoryController.create);

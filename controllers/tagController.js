@@ -1,119 +1,63 @@
 const { Tag } = require('../models');
+const responseHelper = require('../helpers/responseHelper');
 
 const tagController = {
-  getAll: async (req, res) => {
+  async getAll(req, res) {
     try {
       const tags = await Tag.findAll();
-      res.json({
-        status: 'success',
-        data: tags
-      });
+      responseHelper.success(res, tags);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   },
 
-  getById: async (req, res) => {
+  async getById(req, res) {
     try {
-      const { id } = req.params;
-      const tag = await Tag.findByPk(id);
-
+      const tag = await Tag.findByPk(req.params.id);
       if (!tag) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Tag not found'
-        });
+        return responseHelper.fail(res, 'Tag not found');
       }
-
-      res.json({
-        status: 'success',
-        data: tag
-      });
+      responseHelper.success(res, tag);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   },
 
-  create: async (req, res) => {
+  async create(req, res) {
     try {
       const { name } = req.body;
-      
-      if (!name) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'Name is required'
-        });
-      }
-
       const tag = await Tag.create({ name });
-      res.status(201).json({
-        status: 'success',
-        data: tag
-      });
+      responseHelper.success(res, tag, 'Tag created successfully', 201);
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   },
 
-  update: async (req, res) => {
+  async update(req, res) {
     try {
-      const { id } = req.params;
-      const { name } = req.body;
-
-      const tag = await Tag.findByPk(id);
+      const tag = await Tag.findByPk(req.params.id);
       if (!tag) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Tag not found'
-        });
+        return responseHelper.fail(res, 'Tag not found');
       }
-
-      await tag.update({ name });
       
-      res.json({
-        status: 'success',
-        data: tag
-      });
+      await tag.update(req.body);
+      responseHelper.success(res, tag, 'Tag updated successfully');
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   },
 
-  delete: async (req, res) => {
+  async delete(req, res) {
     try {
-      const { id } = req.params;
-      const tag = await Tag.findByPk(id);
-
+      const tag = await Tag.findByPk(req.params.id);
       if (!tag) {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Tag not found'
-        });
+        return responseHelper.fail(res, 'Tag not found');
       }
-
+      
       await tag.destroy();
-      
-      res.json({
-        status: 'success',
-        message: 'Tag deleted successfully'
-      });
+      responseHelper.success(res, null, 'Tag deleted successfully');
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error.message
-      });
+      responseHelper.error(res, error.message);
     }
   }
 };

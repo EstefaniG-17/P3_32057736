@@ -35,8 +35,17 @@ try {
 app.use(express.json());
 
 // Rutas
+const userRoutes = require('./routes/users');
+// Montar endpoints de auth también bajo /api/users para compatibilidad con tests
 app.use('/auth', require('./routes/auth'));
-app.use('/users', require('./routes/users'));
+app.use('/api/users', require('./routes/auth'));
+app.use('/users', userRoutes);
+app.use('/api/users', userRoutes);
+
+// AGREGAR ESTAS NUEVAS RUTAS
+app.use('/api/categories', require('./routes/categories'));
+app.use('/api/tags', require('./routes/tags'));
+app.use('/api/products', require('./routes/products'));
 app.use('/categories', require('./routes/categories'));
 app.use('/products', require('./routes/products'));
 app.use('/tags', require('./routes/tags'));
@@ -44,7 +53,7 @@ app.use('/tags', require('./routes/tags'));
 // Ruta pública de 'self-healing' para productos en la raíz: /p/:id-:slug
 // Algunos tests y clientes esperan acceder a productos mediante /p/{id}-{slug}
 const productController = require('./controllers/productController');
-app.get('/p/:id-:slug', productController.getBySlug);
+app.get('/p/:id-:slug', productController.getProductBySlug);
 
 // Endpoint para inspeccionar el spec consumido por Swagger UI
 app.get('/api-docs.json', (req, res) => {
