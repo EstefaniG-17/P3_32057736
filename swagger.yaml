@@ -48,7 +48,7 @@ components:
         id:
           type: integer
           example: 1
-        name:
+        nombreCompleto:
           type: string
           example: Juan Pérez
         email:
@@ -128,7 +128,6 @@ components:
         stock:
           type: integer
           example: 10
-        # Atributos personalizados para libros
         author:
           type: string
           example: James Dashner
@@ -215,7 +214,7 @@ paths:
   /about:
     get:
       tags:
-        - Public
+        - Public - System
       summary: Información del desarrollador
       description: Retorna información personal del desarrollador
       responses:
@@ -245,7 +244,7 @@ paths:
   /ping:
     get:
       tags:
-        - Public
+        - Public - System
       summary: Health check
       description: Verifica que la API esté funcionando
       responses:
@@ -257,10 +256,37 @@ paths:
                 type: object
                 example: {}
 
+  /health:
+    get:
+      tags:
+        - Public - System
+      summary: Health info
+      description: Estado del servicio
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: OK
+                      timestamp:
+                        type: string
+                        format: date-time
+
   /auth/register:
     post:
       tags:
-        - Authentication
+        - Public - Authentication
       summary: Registrar nuevo usuario
       description: Crea una nueva cuenta de usuario
       requestBody:
@@ -270,11 +296,11 @@ paths:
             schema:
               type: object
               required:
-                - name
+                - nombreCompleto
                 - email
                 - password
               properties:
-                name:
+                nombreCompleto:
                   type: string
                   example: Juan Pérez
                 email:
@@ -300,7 +326,7 @@ paths:
   /auth/login:
     post:
       tags:
-        - Authentication
+        - Public - Authentication
       summary: Iniciar sesión
       description: Autentica un usuario y retorna un token JWT
       requestBody:
@@ -338,7 +364,7 @@ paths:
       tags:
         - Admin - Users
       summary: Obtener todos los usuarios
-      description: Retorna la lista de todos los usuarios (requiere autenticación)
+      description: Retorna la lista de todos los usuarios (requiere autenticación de administrador)
       security:
         - bearerAuth: []
       responses:
@@ -350,6 +376,184 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Acceso denegado - Se requiere rol de administrador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Admin - Users
+      summary: Crear nuevo usuario (Admin)
+      description: Crea un nuevo usuario desde el panel de administración
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nombreCompleto
+                - email
+                - password
+                - role
+              properties:
+                nombreCompleto:
+                  type: string
+                  example: María García
+                email:
+                  type: string
+                  example: maria@example.com
+                password:
+                  type: string
+                  example: password123
+                role:
+                  type: string
+                  enum: [admin, user]
+                  example: user
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}:
+    get:
+      tags:
+        - Admin - Users
+      summary: Obtener usuario por ID
+      description: Obtiene un usuario específico por su ID (requiere autenticación)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+      responses:
+        '200':
+          description: Usuario obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Admin - Users
+      summary: Actualizar usuario
+      description: Actualiza la información de un usuario existente
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombreCompleto:
+                  type: string
+                  example: María García Updated
+                email:
+                  type: string
+                  example: maria.updated@example.com
+                role:
+                  type: string
+                  enum: [admin, user]
+                  example: admin
+      responses:
+        '200':
+          description: Usuario actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Admin - Users
+      summary: Eliminar usuario
+      description: Elimina un usuario del sistema
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+      responses:
+        '200':
+          description: Usuario eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Usuario no encontrado
           content:
             application/json:
               schema:
@@ -376,6 +580,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
     post:
       tags:
         - Admin - Categories
@@ -405,8 +610,130 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories/{id}:
+    get:
+      tags:
+        - Admin - Categories
+      summary: Obtener categoría por ID
+      description: Obtiene una categoría específica por su ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la categoría
+      responses:
+        '200':
+          description: Categoría obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Categoría no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Admin - Categories
+      summary: Actualizar categoría
+      description: Actualiza una categoría existente
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la categoría
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Ciencia Ficción Actualizada
+                description:
+                  type: string
+                  example: Nueva descripción para ciencia ficción
+      responses:
+        '200':
+          description: Categoría actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Admin - Categories
+      summary: Eliminar categoría
+      description: Elimina una categoría del sistema
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la categoría
+      responses:
+        '200':
+          description: Categoría eliminada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Categoría no encontrada
           content:
             application/json:
               schema:
@@ -429,6 +756,158 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Admin - Tags
+      summary: Crear nuevo tag
+      description: Crea un nuevo tag (requiere autenticación)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Aventura
+      responses:
+        '201':
+          description: Tag creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tags/{id}:
+    get:
+      tags:
+        - Admin - Tags
+      summary: Obtener tag por ID
+      description: Obtiene un tag específico por su ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del tag
+      responses:
+        '200':
+          description: Tag obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Tag no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Admin - Tags
+      summary: Actualizar tag
+      description: Actualiza un tag existente
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Aventura Actualizada
+      responses:
+        '200':
+          description: Tag actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Admin - Tags
+      summary: Eliminar tag
+      description: Elimina un tag del sistema
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del tag
+      responses:
+        '200':
+          description: Tag eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Tag no encontrado
           content:
             application/json:
               schema:
@@ -530,6 +1009,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductSearchResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
     post:
       tags:
@@ -608,6 +1093,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: No autorizado
           content:
@@ -652,6 +1143,12 @@ paths:
               description: URL correcta del producto
         '404':
           description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
           content:
             application/json:
               schema:
@@ -715,33 +1212,46 @@ paths:
               properties:
                 name:
                   type: string
+                  example: Maze Runner - Correr o Morir (Actualizado)
                 price:
                   type: number
+                  example: 24.99
                 description:
                   type: string
+                  example: Descripción actualizada del libro
                 categoryId:
                   type: integer
+                  example: 1
                 stock:
                   type: integer
+                  example: 15
                 author:
                   type: string
+                  example: James Dashner
                 isbn:
                   type: string
+                  example: "978-8427200581"
                 publicationYear:
                   type: integer
+                  example: 2009
                 publisher:
                   type: string
+                  example: V&R Editoras
                 language:
                   type: string
+                  example: Español
                 pages:
                   type: integer
+                  example: 384
                 format:
                   type: string
                   enum: [Tapa blanda, Tapa dura, E-book]
+                  example: Tapa dura
                 tags:
                   type: array
                   items:
                     type: integer
+                  example: [1, 2, 3]
       responses:
         '200':
           description: Producto actualizado exitosamente
@@ -749,8 +1259,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Producto no encontrado
           content:
             application/json:
               schema:
@@ -779,6 +1301,12 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Producto no encontrado
           content:
             application/json:
               schema:
