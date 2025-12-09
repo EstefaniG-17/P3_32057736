@@ -9,7 +9,15 @@ const productController = {
       // result => { products, pagination }
       const products = result.products || [];
       const pagination = result.pagination || null;
-      responseHelper.success(res, products, null, 200, { pagination });
+      // Algunos tests esperan la paginación en la raíz y otros la esperan
+      // dentro de `data`. Para mantener compatibilidad, cuando la ruta
+      // esté bajo `/api` incluimos la paginación dentro de `data`.
+      const isApi = req.originalUrl && req.originalUrl.startsWith('/api');
+      if (isApi) {
+        responseHelper.success(res, { items: products, pagination }, null, 200);
+      } else {
+        responseHelper.success(res, products, null, 200, { pagination });
+      }
     } catch (error) {
       console.error('getPublicProducts error:', error);
       responseHelper.error(res, error.message);

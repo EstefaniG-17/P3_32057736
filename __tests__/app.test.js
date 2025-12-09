@@ -88,4 +88,72 @@ describe('Products API', () => {
     expect(res.statusCode).toEqual(200);
   });
 });
+
+// ... después de tus pruebas existentes ...
+
+describe('Product Self-Healing URLs', () => {
+  it('should redirect to correct slug when slug is wrong', async () => {
+    // Primero crear un producto
+    const loginRes = await request(app)
+      .post('/api/users/login')
+      .send({ email: 'test@example.com', password: 'password123' });
+    const token = loginRes.body.data.token;
+
+    const productRes = await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Test Game for Self Healing',
+        description: 'Test description',
+        price: 29.99,
+        categoryId: 1,
+        tagIds: [1],
+        platform: 'PS5',
+        developer: 'Test Dev',
+        genre: 'Action'
+      });
+
+    const productId = productRes.body.data.id;
+    const correctSlug = productRes.body.data.slug;
+
+    // Probar self-healing con slug incorrecto
+    const res = await request(app)
+      .get(`/api/products/p/${productId}-wrong-slug-here`)
+      .redirects(0); // No seguir redirecciones automáticamente
+
+    expect(res.statusCode).toEqual(301);
+    expect(res.headers.location).toContain(correctSlug);
+  });
+});
+
+describe('Product Filtering', () => {
+  it('should filter products by platform', async () => {
+    const res = await request(app)
+      .get('/api/products?platform=PS5');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toEqual('success');
+  });
+
+  it('should filter products by price range', async () => {
+    const res = await request(app)
+      .get('/api/products?price_min=20&price_max=60');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toEqual('success');
+  });
+
+  it('should search products by name', async () => {
+    const res = await request(app)
+      .get('/api/products?search=zelda');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toEqual('success');
+  });
+
+  it('should paginate products', async () => {
+    const res = await request(app)
+      .get('/api/products?page=1&limit=5');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.data.pagination).toHaveProperty('page', 1);
+    expect(res.body.data.pagination).toHaveProperty('limit', 5);
+  });
+});
 });

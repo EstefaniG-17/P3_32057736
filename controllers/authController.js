@@ -19,12 +19,12 @@ const authController = {
       }
 
       // Crear usuario (el hook del modelo hará el hash de la contraseña)
+      // No guardar el campo `seccion` por requerimiento; sólo almacenar cedula.
       const user = await User.create({
         nombreCompleto: fullName,
         email,
         password,
         cedula: cedula || null,
-        seccion: seccion || null,
         role: role || 'user'
       });
 
@@ -42,6 +42,7 @@ const authController = {
             id: user.id,
             nombreCompleto: user.nombreCompleto,
             email: user.email,
+            cedula: user.cedula || null,
             role: user.role
           },
           token
