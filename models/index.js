@@ -6,8 +6,10 @@ const env = process.env.NODE_ENV || 'development';
 let sequelize;
 if (config && config.sequelize) {
   sequelize = config.sequelize;
+  console.log('models/index.js: using shared sequelize instance from config');
 } else {
   const dbConfig = config[env];
+  console.log(`models/index.js: creating sequelize for env=${env}, storage=${dbConfig && dbConfig.storage}`);
   sequelize = new Sequelize({
     dialect: dbConfig.dialect,
     storage: dbConfig.storage,

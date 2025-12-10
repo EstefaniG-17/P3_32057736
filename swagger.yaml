@@ -8,8 +8,6 @@ info:
     email: estefani@example.com
 
 servers:
-  - url: https://p3-32057736.onrender.com
-    description: Servidor de producción
   - url: http://localhost:3000
     description: Servidor de desarrollo
 
@@ -58,6 +56,9 @@ components:
           type: string
           enum: [admin, user]
           example: user
+        cedula:
+          type: string
+          example: "32057736"
         createdAt:
           type: string
           format: date-time
@@ -309,6 +310,9 @@ paths:
                 password:
                   type: string
                   example: password123
+                cedula:
+                  type: string
+                  example: "32057736"
       responses:
         '201':
           description: Usuario creado exitosamente
@@ -415,6 +419,9 @@ paths:
                 password:
                   type: string
                   example: password123
+                cedula:
+                  type: string
+                  example: "32057736"
                 role:
                   type: string
                   enum: [admin, user]
