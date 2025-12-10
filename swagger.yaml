@@ -12,20 +12,24 @@ servers:
 
 
 tags:
-  - name: Public - Products
-    description: Endpoints públicos para consulta de productos
-  - name: Admin - Products  
-    description: Gestión de productos (requiere autenticación)
-  - name: Admin - Categories
-    description: Gestión de categorías (requiere autenticación)
-  - name: Admin - Tags
-    description: Gestión de etiquetas (requiere autenticación)
   - name: Public - Info
     description: Información pública del sistema
   - name: Public - Auth
     description: Endpoints de autenticación
   - name: Admin - Users
     description: Gestión de usuarios
+  - name: Admin - Categories
+    description: Gestión de categorías (requiere autenticación)
+  - name: Admin - Tags
+    description: Gestión de etiquetas (requiere autenticación)
+  - name: Public - Products
+    description: Endpoints públicos para consulta de productos
+  - name: Admin - Products  
+    description: Gestión de productos (requiere autenticación)
+  
+  
+  
+  
 
 components:
   schemas:
@@ -37,10 +41,10 @@ components:
           example: 1
         name:
           type: string
-          example: "Iron Man Mark LXXXV"
+          example: "The Maze Runner"
         description:
           type: string
-          example: "Funko Pop de Iron Man con traje de Endgame"
+          example: "Primera novela de la saga Maze Runner, novela distópica juvenil."
         price:
           type: number
           format: float
@@ -50,31 +54,34 @@ components:
           example: 50
         sku:
           type: string
-          example: "AVG001"
-        brand:
+          example: "BK001"
+        author:
           type: string
-          example: "Funko"
+          example: "James Dashner"
+        isbn:
+          type: string
+          example: "978-0385737951"
+        publicationYear:
+          type: integer
+          example: 2009
         publisher:
           type: string
-          example: "Marvel"
-        movie:
+          example: "Delacorte Press"
+        language:
           type: string
-          example: "Avengers: Endgame"
-        character:
-          type: string
-          example: "Iron Man"
-        edition:
-          type: string
-          example: "Standard"
-        releaseYear:
+          example: "English"
+        pages:
           type: integer
-          example: 2024
-        isExclusive:
+          example: 384
+        format:
+          type: string
+          example: "Tapa dura"
+        isAvailable:
           type: boolean
-          example: false
+          example: true
         slug:
           type: string
-          example: "iron-man-mark-lxxxv-avg001"
+          example: "the-maze-runner-97803857"
         CategoryId:
           type: integer
           example: 1
@@ -92,10 +99,10 @@ components:
           example: 1
         name:
           type: string
-          example: "Avengers"
+          example: "Books"
         description:
           type: string
-          example: "Avengers movie collection"
+          example: "Libros y novelas"
         createdAt:
           type: string
           format: date-time
@@ -110,7 +117,7 @@ components:
           example: 1
         name:
           type: string
-          example: "limited-edition"
+          example: "dystopian"
         createdAt:
           type: string
           format: date-time
@@ -159,14 +166,14 @@ paths:
       summary: Información del desarrollador
       responses:
         '200':
-          description: Información del desarrolladora
+          description: Información del desarrollador
           content:
             application/json:
               example:
                 status: "success"
                 data:
-                  nombreCompleto: "Cristhian Alfonzo Angyalbert Padrón Álvarez"
-                  cedula: "31031669"
+                  nombreCompleto: "Estefani Jeannielys Gonzalez Gonzalez"
+                  cedula: "32057736"
                   seccion: "1"
 
   /auth/register:
@@ -188,10 +195,10 @@ paths:
               properties:
                 nombreCompleto:
                   type: string
-                  example: "Adriana Padron"
+                  example: "Nombre Completo"
                 email:
                   type: string
-                  example: "adri@example.com"
+                  example: "email@example.com"
                 password:
                   type: string
                   example: "password123"
@@ -208,8 +215,8 @@ paths:
                 data:
                   user:
                     id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                    fullName: "Adriana Padron"
-                    email: "adri@example.com"
+                    fullName: "Nombre Completo"
+                    email: "email@example.com"
                     cedula: "12345678"
                   token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
@@ -230,7 +237,7 @@ paths:
               properties:
                 email:
                   type: string
-                  example: "adri@example.com"
+                  example: "email@example.com"
                 password:
                   type: string
                   example: "password123"
@@ -244,8 +251,8 @@ paths:
                 data:
                   user:
                     id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                    fullName: "Adriana Padron"
-                    email: "adri@example.com"
+                    fullName: "Nombre Completo"
+                    email: "email@example.com"
                     cedula: "12345678"
                   token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
@@ -265,14 +272,14 @@ paths:
                 status: "success"
                 data:
                   - id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                    fullName: "Adriana Padron"
-                    email: "adri@example.com"
+                    fullName: "Nombre Completo"
+                    email: "email@example.com"
                     cedula: "12345678"
                     createdAt: "2024-01-01T00:00:00.000Z"
                     updatedAt: "2024-01-01T00:00:00.000Z"
                   - id: "b2c3d4e5-f6g7-8901-bcde-f23456789012"
-                    fullName: "Adriana Padron"
-                    email: "adri@example.com"
+                    fullName: "Nombre Completo 2"
+                    email: "email@example.com"
                     cedula: "87654321"
                     createdAt: "2024-01-01T00:00:00.000Z"
                     updatedAt: "2024-01-01T00:00:00.000Z"
@@ -297,10 +304,10 @@ paths:
               properties:
                 fullName:
                   type: string
-                  example: "Adriana Padron"
+                  example: "Nombre Completo"
                 email:
                   type: string
-                  example: "adri@example.com"
+                  example: "email@example.com"
                 password:
                   type: string
                   example: "password123"
@@ -316,8 +323,8 @@ paths:
                 status: "success"
                 data:
                   id: "c3d4e5f6-g7h8-9012-cdef-345678901234"
-                  fullName: "Adriana Padron"
-                  email: "adri@example.com"
+                  fullName: "Nombre Completo"
+                  email: "email@example.com"
                   cedula: "11223344"
                   createdAt: "2024-01-01T00:00:00.000Z"
                   updatedAt: "2024-01-01T00:00:00.000Z"
@@ -344,8 +351,8 @@ paths:
                 status: "success"
                 data:
                   id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                  fullName: "Adriana Padron"
-                  email: "adri@example.com"
+                  fullName: "Nombre Completo"
+                  email: "email@example.com"
                   cedula: "12345678"
                   createdAt: "2024-01-01T00:00:00.000Z"
                   updatedAt: "2024-01-01T00:00:00.000Z"
@@ -371,10 +378,10 @@ paths:
               properties:
                 fullName:
                   type: string
-                  example: "Adriana Padron"
+                  example: "Nombre Completo"
                 email:
                   type: string
-                  example: "adri.p@example.com"
+                  example: "email@example.com"
                 cedula:
                   type: string
                   example: "12345678"
@@ -387,8 +394,8 @@ paths:
                 status: "success"
                 data:
                   id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                  fullName: "Adriana Padron"
-                  email: "adri.p@example.com"
+                  fullName: "Nombre Completo"
+                  email: "emailp@example.com"
                   cedula: "12345678"
                   updatedAt: "2024-01-02T00:00:00.000Z"
 
@@ -656,19 +663,43 @@ paths:
           in: query
           schema:
             type: string
-        - name: movie
+        - name: author
           in: query
           schema:
             type: string
-        - name: character
+        - name: isbn
           in: query
           schema:
             type: string
-        - name: edition
+        - name: publication_year_min
+          in: query
+          schema:
+            type: integer
+        - name: publication_year_max
+          in: query
+          schema:
+            type: integer
+        - name: publisher
           in: query
           schema:
             type: string
-        - name: isExclusive
+        - name: language
+          in: query
+          schema:
+            type: string
+        - name: pages_min
+          in: query
+          schema:
+            type: integer
+        - name: pages_max
+          in: query
+          schema:
+            type: integer
+        - name: format
+          in: query
+          schema:
+            type: string
+        - name: isAvailable
           in: query
           schema:
             type: boolean
@@ -715,9 +746,6 @@ paths:
               required:
                 - name
                 - price
-                - sku
-                - movie
-                - character
                 - CategoryId
               properties:
                 name:
@@ -730,19 +758,21 @@ paths:
                   type: integer
                 sku:
                   type: string
-                brand:
+                author:
                   type: string
+                isbn:
+                  type: string
+                publicationYear:
+                  type: integer
                 publisher:
                   type: string
-                movie:
+                language:
                   type: string
-                character:
-                  type: string
-                edition:
-                  type: string
-                releaseYear:
+                pages:
                   type: integer
-                isExclusive:
+                format:
+                  type: string
+                isAvailable:
                   type: boolean
                 CategoryId:
                   type: integer
@@ -803,19 +833,21 @@ paths:
                   type: integer
                 sku:
                   type: string
-                brand:
+                author:
                   type: string
+                isbn:
+                  type: string
+                publicationYear:
+                  type: integer
                 publisher:
                   type: string
-                movie:
+                language:
                   type: string
-                character:
-                  type: string
-                edition:
-                  type: string
-                releaseYear:
+                pages:
                   type: integer
-                isExclusive:
+                format:
+                  type: string
+                isAvailable:
                   type: boolean
                 CategoryId:
                   type: integer
@@ -913,15 +945,21 @@ components:
           format: float
         stock:
           type: integer
-        character:
+        author:
           type: string
-        movie:
+        isbn:
           type: string
-        edition:
-          type: string
-        number:
+        publicationYear:
           type: integer
-        exclusive:
+        publisher:
+          type: string
+        language:
+          type: string
+        pages:
+          type: integer
+        format:
+          type: string
+        isAvailable:
           type: boolean
         slug:
           type: string
@@ -997,19 +1035,43 @@ paths:
           schema:
             type: string
         - in: query
-          name: character
+          name: author
           schema:
             type: string
         - in: query
-          name: movie
+          name: isbn
           schema:
             type: string
         - in: query
-          name: edition
+          name: publication_year_min
+          schema:
+            type: integer
+        - in: query
+          name: publication_year_max
+          schema:
+            type: integer
+        - in: query
+          name: publisher
           schema:
             type: string
         - in: query
-          name: exclusive
+          name: language
+          schema:
+            type: string
+        - in: query
+          name: pages_min
+          schema:
+            type: integer
+        - in: query
+          name: pages_max
+          schema:
+            type: integer
+        - in: query
+          name: format
+          schema:
+            type: string
+        - in: query
+          name: isAvailable
           schema:
             type: boolean
       responses:

@@ -17,11 +17,17 @@ exports.getProducts = async (req, res) => {
       price_min,
       price_max,
       search,
-      movie,
-      character,
-      edition,
-      universe,
-      exclusive
+      // Book-specific filters
+      author,
+      isbn,
+      publication_year_min,
+      publication_year_max,
+      publisher,
+      language,
+      pages_min,
+      pages_max,
+      format,
+      isAvailable
     } = req.query;
 
     // Usar Builder Pattern para construir consulta
@@ -30,17 +36,20 @@ exports.getProducts = async (req, res) => {
       .withTags(tags)
       .withPriceRange(price_min, price_max)
       .withSearch(search)
-      .withMovie(movie)
-      .withCharacter(character)
-      .withEdition(edition)
-      .withUniverse(universe)
-      .withExclusive(exclusive);
+      .withAuthor(author)
+      .withISBN(isbn)
+      .withPublicationYear(publication_year_min, publication_year_max)
+      .withPublisher(publisher)
+      .withLanguage(language)
+      .withPages(pages_min, pages_max)
+      .withFormat(format)
+      .withAvailability(isAvailable);
 
     // Aplicar paginación sólo si el cliente la solicitó explícitamente
     // o si envió cualquier filtro. Si no hay filtros ni parámetros de
     // paginación, devolvemos TODOS los productos (sin limit).
     const hasFilters = Boolean(
-      category || tags || price_min || price_max || search || movie || character || edition || universe || (typeof exclusive !== 'undefined')
+      category || tags || price_min || price_max || search || author || isbn || publication_year_min || publication_year_max || publisher || language || pages_min || pages_max || format || (typeof isAvailable !== 'undefined')
     );
 
     if (hasFilters || req.query.page || req.query.limit) {

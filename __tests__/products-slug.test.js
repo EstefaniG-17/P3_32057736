@@ -22,13 +22,11 @@ describe('Product Slug Generation', () => {
 
     // Crear un producto base para poder probar actualización
     const productData = {
-      name: 'Test Product Avengers',
+      name: 'Test Product maze runner',
       description: 'Test description',
       price: 25.99,
       stock: 10,
       sku: 'BASE123',
-      movie: 'Avengers: Endgame',
-      character: 'Test Character',
       CategoryId: catRes.body.data.id,
       tags: tagRes.body.data ? [tagRes.body.data.id] : undefined
     };

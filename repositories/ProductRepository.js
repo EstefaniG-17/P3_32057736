@@ -20,14 +20,14 @@ class ProductRepository {
   }
 
   async create(productData) {
-    // Create product first, then associate tags if provided to avoid
-    // eager-loading alias issues.
-    const { tags, CategoryId, ...rest } = productData;
-    const product = await this.model.create({ ...rest, CategoryId });
+    // Accept both `tags` or `tagIds`, and `CategoryId` or `categoryId` from clients
+    const { tags, tagIds, CategoryId, categoryId, ...rest } = productData;
+    const resolvedCategoryId = CategoryId || categoryId || rest.CategoryId || rest.categoryId || null;
+    const product = await this.model.create({ ...rest, CategoryId: resolvedCategoryId });
 
-    if (tags && Array.isArray(tags) && tags.length > 0) {
-      // tags might be array of ids
-      await product.setTags(tags);
+    const tagArray = Array.isArray(tags) ? tags : Array.isArray(tagIds) ? tagIds : [];
+    if (tagArray.length > 0) {
+      await product.setTags(tagArray);
     }
 
     return await this.findById(product.id);
@@ -36,10 +36,12 @@ class ProductRepository {
   async update(id, productData) {
     const product = await this.findById(id);
     if (!product) return null;
-    const { tags, CategoryId, ...rest } = productData;
-    await product.update({ ...rest, CategoryId });
-    if (tags && Array.isArray(tags)) {
-      await product.setTags(tags);
+    const { tags, tagIds, CategoryId, categoryId, ...rest } = productData;
+    const resolvedCategoryId = CategoryId || categoryId || rest.CategoryId || rest.categoryId || undefined;
+    await product.update({ ...rest, CategoryId: resolvedCategoryId });
+    const tagArray = Array.isArray(tags) ? tags : Array.isArray(tagIds) ? tagIds : null;
+    if (Array.isArray(tagArray)) {
+      await product.setTags(tagArray);
     }
     return await this.findById(id);
   }

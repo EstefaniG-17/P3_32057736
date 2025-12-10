@@ -61,41 +61,69 @@ class ProductQueryBuilder {
     return this;
   }
 
-  withMovie(movie) {
-    if (movie) {
-      this.queryOptions.where.movie = { [Op.like]: `%${movie}%` };
+  // Filtros orientados a productos tipo libro
+  withAuthor(author) {
+    if (author) {
+      this.queryOptions.where.author = { [Op.like]: `%${author}%` };
+      this.queryOptions.include = this.queryOptions.include || [];
     }
     return this;
   }
 
-  withEdition(edition) {
-    if (edition) {
-      this.queryOptions.where.edition = edition;
+  withISBN(isbn) {
+    if (isbn) {
+      this.queryOptions.where.isbn = { [Op.like]: `%${isbn}%` };
     }
     return this;
   }
 
-  // Filtros específicos para Funko Pop Avengers
-  withCharacter(character) {
-    if (character) {
-      this.queryOptions.where.character = { [Op.like]: `%${character}%` };
+  withPublicationYear(minYear, maxYear) {
+    if (minYear || maxYear) {
+      this.queryOptions.where.publicationYear = {};
+      if (minYear) this.queryOptions.where.publicationYear[Op.gte] = parseInt(minYear);
+      if (maxYear) this.queryOptions.where.publicationYear[Op.lte] = parseInt(maxYear);
     }
     return this;
   }
 
-  withUniverse(universe) {
-    if (universe) {
-      this.queryOptions.where.universe = { [Op.like]: `%${universe}%` };
+  withPublisher(publisher) {
+    if (publisher) {
+      this.queryOptions.where.publisher = { [Op.like]: `%${publisher}%` };
     }
     return this;
   }
 
-  withExclusive(exclusive) {
-    if (exclusive !== undefined) {
-      this.queryOptions.where.exclusive = exclusive === 'true';
+  withLanguage(language) {
+    if (language) {
+      this.queryOptions.where.language = { [Op.like]: `%${language}%` };
     }
     return this;
   }
+
+  withPages(minPages, maxPages) {
+    if (minPages || maxPages) {
+      this.queryOptions.where.pages = {};
+      if (minPages) this.queryOptions.where.pages[Op.gte] = parseInt(minPages);
+      if (maxPages) this.queryOptions.where.pages[Op.lte] = parseInt(maxPages);
+    }
+    return this;
+  }
+
+  withFormat(format) {
+    if (format) {
+      this.queryOptions.where.format = { [Op.like]: `%${format}%` };
+    }
+    return this;
+  }
+
+  withAvailability(isAvailable) {
+    if (typeof isAvailable !== 'undefined') {
+      if (isAvailable === 'true' || isAvailable === true) this.queryOptions.where.isAvailable = true;
+      else if (isAvailable === 'false' || isAvailable === false) this.queryOptions.where.isAvailable = false;
+    }
+    return this;
+  }
+
 
   build() {
     return this.queryOptions;

@@ -6,34 +6,18 @@ const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express');
 const { sequelize, Category, Tag, Product } = require('./models/index');
 
-const seedDatabase = async () => {
-  try {
-    await sequelize.sync({ force: false });
-    
-    // Crear categorías por defecto
-    const categories = await Category.bulkCreate([
-      { name: 'Avengers', description: 'Películas de Avengers' },
-      { name: 'Iron Man', description: 'Figuras de Iron Man' },
-      { name: 'Captain America', description: 'Figuras de Captain America' }
-    ], { ignoreDuplicates: true });
-
-    // Crear tags por defecto
-    const tags = await Tag.bulkCreate([
-      { name: 'limited-edition' },
-      { name: 'exclusive' },
-      { name: 'glow-in-dark' },
-      { name: 'jumbo-size' }
-    ], { ignoreDuplicates: true });
-
-    console.log('✅ Database seeded successfully');
-  } catch (error) {
-    console.error('❌ Seeding error:', error);
-  }
-};
-
-// Seed the database only when not running tests (tests manage their own DB)
+// Reemplazar el seed por defecto (Funko) y usar la semilla de libros (scripts/seedData.js)
+// Esto asegura que las categorías y etiquetas reflejen los libros del seed.
 if (process.env.NODE_ENV !== 'test') {
-  seedDatabase();
+  try {
+    const seedData = require('./scripts/seedData');
+    // seedData hace sync con force: true internamente y crea las categorías/tags/libros
+    seedData()
+      .then(() => console.log('✅ Database seeded successfully (books)'))
+      .catch(err => console.error('❌ seedData error:', err && err.stack ? err.stack : err));
+  } catch (err) {
+    console.error('❌ Could not load seedData:', err && err.stack ? err.stack : err);
+  }
 }
 
 // Importar rutas
@@ -149,8 +133,8 @@ app.get('/about', (req, res) => {
   res.json({
     status: 'success',
     data: {
-      nombreCompleto: 'Cristhian Alfonzo Angyalbert Padrón Álvarez',
-      cedula: '31031669',
+      nombreCompleto: 'Estefani Jeannielys Gonzalez Gonzalez',
+      cedula: '32057736',
       seccion: '1'
     }
   });
