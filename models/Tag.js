@@ -1,7 +1,5 @@
-const { DataTypes } = require('sequelize');
-
-module.exports = (sequelize) => {
-  const Tag = sequelize.define('Tag', {
+module.exports = (sequelize, DataTypes) => {
+  return sequelize.define('Tag', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -9,13 +7,11 @@ module.exports = (sequelize) => {
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
+      unique: true,
+      allowNull: false
     }
   }, {
     tableName: 'tags',
     timestamps: true
   });
-
-  return Tag;
 };

@@ -1,7 +1,5 @@
-const { DataTypes } = require('sequelize');
-
-module.exports = (sequelize) => {
-  const Category = sequelize.define('Category', {
+module.exports = (sequelize, DataTypes) => {
+  return sequelize.define('Category', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -9,6 +7,7 @@ module.exports = (sequelize) => {
     },
     name: {
       type: DataTypes.STRING,
+      unique: true,
       allowNull: false
     },
     description: {
@@ -19,6 +18,4 @@ module.exports = (sequelize) => {
     tableName: 'categories',
     timestamps: true
   });
-
-  return Category;
 };

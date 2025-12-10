@@ -1,15 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const categoryController = require('../controllers/categoryController');
-const authMiddleware = require('../middleware/authMiddleware');
+const categoriesController = require('../controllers/categoriesController');
+const { authenticateToken } = require('../middleware/auth');
 
-// Proteger TODAS las rutas de categories
-router.use(authMiddleware);
-
-router.get('/', categoryController.getAll);
-router.get('/:id', categoryController.getById);
-router.post('/', categoryController.create);
-router.put('/:id', categoryController.update);
-router.delete('/:id', categoryController.delete);
+// Todas las rutas protegidas
+router.get('/', authenticateToken, categoriesController.getCategories);
+router.get('/:id', authenticateToken, categoriesController.getCategoryById);
+router.post('/', authenticateToken, categoriesController.createCategory);
+router.put('/:id', authenticateToken, categoriesController.updateCategory);
+router.delete('/:id', authenticateToken, categoriesController.deleteCategory);
 
 module.exports = router;

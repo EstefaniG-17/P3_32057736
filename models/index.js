@@ -1,53 +1,47 @@
-const { Sequelize } = require('sequelize');
-const config = require('../config/database');
+const { Sequelize, DataTypes } = require('sequelize');
 
-// Seleccionar configuración según env
-const env = process.env.NODE_ENV || 'development';
-let sequelize;
-if (config && config.sequelize) {
-  sequelize = config.sequelize;
-  console.log('models/index.js: using shared sequelize instance from config');
-} else {
-  const dbConfig = config[env];
-  console.log(`models/index.js: creating sequelize for env=${env}, storage=${dbConfig && dbConfig.storage}`);
-  sequelize = new Sequelize({
-    dialect: dbConfig.dialect,
-    storage: dbConfig.storage,
-    logging: dbConfig.logging
-  });
-}
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: './database.sqlite',
+  logging: false
+});
 
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+// Inicializar modelos desde sus fábricas
+const Category = require('./Category')(sequelize, DataTypes);
+const Tag = require('./Tag')(sequelize, DataTypes);
+const ProductTag = require('./ProductTag')(sequelize, DataTypes);
+const Product = require('./Product')(sequelize, DataTypes);
 
-// Importar modelos (inicializarlos con la instancia de sequelize)
-db.User = require('./User')(sequelize, Sequelize.DataTypes);
-db.Category = require('./Category')(sequelize, Sequelize.DataTypes);
-db.Tag = require('./Tag')(sequelize, Sequelize.DataTypes);
-db.Product = require('./Product')(sequelize, Sequelize.DataTypes);
-
-// Definir relaciones
-db.Product.belongsTo(db.Category, {
-  foreignKey: 'categoryId',
+// Configurar asociaciones entre modelos
+Product.belongsTo(Category, {
+  foreignKey: 'CategoryId',
   as: 'category'
 });
-db.Category.hasMany(db.Product, {
-  foreignKey: 'categoryId',
+
+Category.hasMany(Product, {
+  foreignKey: 'CategoryId',
   as: 'products'
 });
 
-db.Product.belongsToMany(db.Tag, {
-  through: 'ProductTags',
-  foreignKey: 'productId',
-  otherKey: 'tagId',
+Product.belongsToMany(Tag, {
+  through: ProductTag,
+  foreignKey: 'ProductId',
+  otherKey: 'TagId',
   as: 'tags'
 });
-db.Tag.belongsToMany(db.Product, {
-  through: 'ProductTags',
-  foreignKey: 'tagId',
-  otherKey: 'productId',
+
+Tag.belongsToMany(Product, {
+  through: ProductTag,
+  foreignKey: 'TagId',
+  otherKey: 'ProductId',
   as: 'products'
 });
-
-module.exports = db;
+module.exports = {
+  sequelize,
+  Sequelize,
+  DataTypes,
+  Category,
+  Tag,
+  Product,
+  ProductTag
+};

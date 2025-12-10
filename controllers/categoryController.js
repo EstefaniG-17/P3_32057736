@@ -1,69 +1,33 @@
-const db = require('../models');
-const { Category } = db;
-const responseHelper = require('../helpers/responseHelper');
+// controllers/categoryController.js - NUEVO ARCHIVO
+const { Category } = require('../models');
+const asyncHandler = require('../utils/asyncHandler');
 
-const categoryController = {
-  async getAll(req, res) {
-    try {
-      const categories = await Category.findAll();
-      responseHelper.success(res, categories);
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
-  },
+exports.getAllCategories = asyncHandler(async (req, res) => {
+  const categories = await Category.findAll();
+  res.jsend.success(categories);
+});
 
-  async getById(req, res) {
-    try {
-      const category = await Category.findByPk(req.params.id);
-      if (!category) {
-        return responseHelper.fail(res, 'Category not found');
-      }
-      responseHelper.success(res, category);
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
-  },
+exports.createCategory = asyncHandler(async (req, res) => {
+  const category = await Category.create(req.body);
+  res.status(201).jsend.success(category);
+});
 
-  async create(req, res) {
-    try {
-      const { name, description } = req.body;
-      const category = await Category.create({ name, description });
-      responseHelper.success(res, category, 'Category created successfully', 201);
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
-  },
-
-  async update(req, res) {
-    try {
-      const category = await Category.findByPk(req.params.id);
-      if (!category) {
-        return responseHelper.fail(res, 'Category not found');
-      }
-      
-      await category.update(req.body);
-      responseHelper.success(res, category, 'Category updated successfully');
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
-  },
-
-  async delete(req, res) {
-    try {
-      const category = await Category.findByPk(req.params.id);
-      if (!category) {
-        return responseHelper.fail(res, 'Category not found');
-      }
-      // Eliminar productos relacionados primero para evitar errores por FK
-      if (db.Product) {
-        await db.Product.destroy({ where: { categoryId: category.id } });
-      }
-      await category.destroy();
-      responseHelper.success(res, null, 'Category deleted successfully');
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
+exports.updateCategory = asyncHandler(async (req, res) => {
+  const category = await Category.findByPk(req.params.id);
+  if (!category) {
+    return res.status(404).jsend.fail('Category not found');
   }
-};
+  
+  await category.update(req.body);
+  res.jsend.success(category);
+});
 
-module.exports = categoryController;
+exports.deleteCategory = asyncHandler(async (req, res) => {
+  const category = await Category.findByPk(req.params.id);
+  if (!category) {
+    return res.status(404).jsend.fail('Category not found');
+  }
+  
+  await category.destroy();
+  res.jsend.success({ message: 'Category deleted successfully' });
+});
