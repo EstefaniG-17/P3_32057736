@@ -3,38 +3,38 @@ const app = require('../app');
 
 describe('Product Filters', () => {
   describe('GET /products with filters', () => {
-    it('should filter by movie', async () => {
+    it('should filter by publisher', async () => {
       const response = await request(app)
         .get('/products')
-        .query({ movie: 'Endgame' });
+        .query({ publisher: 'Delacorte' });
 
       expect(response.status).toBe(200);
       expect(response.body.status).toBe('success');
-      // Todos los productos deben ser de la película Endgame
+      // Todos los productos deben ser del publisher Delacorte (o contener esa palabra)
       response.body.data.products.forEach(product => {
-        expect(product.movie).toMatch(/Endgame/i);
+        expect(product.publisher).toMatch(/Delacorte/i);
       });
     });
 
-    it('should filter by character', async () => {
+    it('should filter by author', async () => {
       const response = await request(app)
         .get('/products')
-        .query({ character: 'Iron Man' });
+        .query({ author: 'James Dashner' });
 
       expect(response.status).toBe(200);
       response.body.data.products.forEach(product => {
-        expect(product.character).toMatch(/Iron Man/i);
+        expect(product.author).toMatch(/James Dashner/i);
       });
     });
 
-    it('should filter by edition', async () => {
+    it('should filter by format', async () => {
       const response = await request(app)
         .get('/products')
-        .query({ edition: 'Exclusive' });
+        .query({ format: 'Tapa blanda' });
 
       expect(response.status).toBe(200);
       response.body.data.products.forEach(product => {
-        expect(product.edition).toBe('Exclusive');
+        expect(product.format).toBe('Tapa blanda');
       });
     });
 

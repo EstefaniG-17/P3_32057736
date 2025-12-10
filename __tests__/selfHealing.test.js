@@ -13,14 +13,14 @@ describe('Self-Healing URL', () => {
   });
 
   it('should redirect to correct slug when slug is wrong', async () => {
-    // Crear producto de prueba
+    // Crear producto de prueba (libro)
     const product = await Product.create({
-      name: 'Iron Man Funko Pop',
-      price: 29.99,
+      name: 'The Maze Runner - SelfHealing',
+      price: 12.99,
       stock: 1,
       sku: 'SH001',
-      movie: 'Avengers: Endgame',
-      character: 'Iron Man'
+      author: 'James Dashner',
+      isbn: '978-0385737951'
     });
 
     await request(app)
@@ -31,12 +31,12 @@ describe('Self-Healing URL', () => {
 
   it('should return product when slug is correct', async () => {
     const product = await Product.create({
-      name: 'Captain America Funko Pop',
-      price: 29.99,
+      name: 'Crank Palace',
+      price: 11.99,
       stock: 1,
       sku: 'SH002',
-      movie: 'Avengers: Endgame',
-      character: 'Captain America'
+      author: 'James Dashner',
+      isbn: '978-1984815952'
     });
 
     await request(app)
