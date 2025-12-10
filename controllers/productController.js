@@ -5,21 +5,55 @@ const productController = {
   // RUTAS PÚBLICAS
   async getPublicProducts(req, res) {
     try {
-      const result = await productRepository.findAllWithFilters(req.query);
-      // result => { products, pagination }
+      console.log('\n🔍 === getPublicProducts INICIADO ===');
+      console.log('📝 URL completa:', req.originalUrl);
+      console.log('🎯 Query params:', req.query);
+      console.log('📍 Path:', req.path);
+      
+      const filters = req.query || {};
+      console.log('🎛️ Filtros procesados:', filters);
+
+      // Verificar si hay filtros reales (no solo paginación y con valor no vacío)
+      const ignoredKeys = ['page', 'limit', 'per_page', 'pages', 'illimit'];
+      const hasRealFilters = Object.entries(filters).some(([key, value]) => {
+        if (ignoredKeys.includes(String(key).toLowerCase())) return false;
+        if (value === undefined || value === null) return false;
+        if (Array.isArray(value) && value.length === 0) return false;
+        if (String(value).trim() === '') return false;
+        return true;
+      });
+
+      console.log('❓ ¿Tiene filtros reales?:', hasRealFilters);
+      
+      const result = await productRepository.findAllWithFilters(filters);
+      
+      console.log('📊 Resultado del repositorio:');
+      console.log(`   Productos encontrados: ${result.products?.length || 0}`);
+      console.log('   Paginación:', result.pagination);
+      
       const products = result.products || [];
       const pagination = result.pagination || null;
-      // Algunos tests esperan la paginación en la raíz y otros la esperan
-      // dentro de `data`. Para mantener compatibilidad, cuando la ruta
-      // esté bajo `/api` incluimos la paginación dentro de `data`.
+      
+      // Para depuración, mostrar primeros 3 productos
+      if (products.length > 0) {
+        console.log('📦 Primeros 3 productos:');
+        products.slice(0, 3).forEach((p, i) => {
+          console.log(`   ${i+1}. ${p.name} - $${p.price}`);
+        });
+      }
+      
       const isApi = req.originalUrl && req.originalUrl.startsWith('/api');
       if (isApi) {
         responseHelper.success(res, { items: products, pagination }, null, 200);
       } else {
         responseHelper.success(res, products, null, 200, { pagination });
       }
+      
+      console.log('✅ === getPublicProducts FINALIZADO ===\n');
+      
     } catch (error) {
-      console.error('getPublicProducts error:', error);
+      console.error('❌ getPublicProducts ERROR:', error.message);
+      console.error('Stack:', error.stack);
       responseHelper.error(res, error.message);
     }
   },
