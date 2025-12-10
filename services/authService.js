@@ -1,17 +1,17 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const User = require('../models/User');
 
 class AuthService {
   generateToken(userId) {
     return jwt.sign(
       { userId }, 
-      process.env.JWT_SECRET || 'test-secret',
+      process.env.JWT_SECRET || 'avengers-funko-secret-key',
       { expiresIn: '24h' }
     );
   }
 
   verifyToken(token) {
-    return jwt.verify(token, process.env.JWT_SECRET || 'test-secret');
+    return jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_para_desarrollo');
   }
 
   async register(userData) {

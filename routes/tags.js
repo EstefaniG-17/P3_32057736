@@ -1,15 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const tagController = require('../controllers/tagController');
-const authMiddleware = require('../middleware/authMiddleware');
+const tagsController = require('../controllers/tagController');
+const { authenticateToken } = require('../middleware/auth');
 
-// Proteger TODAS las rutas de tags
-router.use(authMiddleware);
-
-router.get('/', tagController.getAll);
-router.get('/:id', tagController.getById);
-router.post('/', tagController.create);
-router.put('/:id', tagController.update);
-router.delete('/:id', tagController.delete);
+// Todas las rutas protegidas
+router.get('/', authenticateToken, tagsController.getTags);
+router.get('/:id', authenticateToken, tagsController.getTagById);
+router.post('/', authenticateToken, tagsController.createTag);
+router.put('/:id', authenticateToken, tagsController.updateTag);
+router.delete('/:id', authenticateToken, tagsController.deleteTag);
 
 module.exports = router;

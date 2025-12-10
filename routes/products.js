@@ -1,18 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const productController = require('../controllers/productController');
-const authMiddleware = require('../middleware/authMiddleware');
+const productsController = require('../controllers/productController');
+const { authenticateToken } = require('../middleware/auth');
 
-// RUTAS PÚBLICAS
-router.get('/', productController.getPublicProducts);
-router.get('/p/:id-:slug', productController.getProductBySlug);
+// Rutas PÚBLICAS
+router.get('/', productsController.getProducts); // GET /products
+router.get('/p/:id-:slug', productsController.getProductBySlug); // GET /p/123-slug
 
-// RUTAS PROTEGIDAS
-router.use(authMiddleware);
-router.get('/admin', productController.getAll); // Para administradores
-router.get('/:id', productController.getById);
-router.post('/', productController.create);
-router.put('/:id', productController.update);
-router.delete('/:id', productController.delete);
+// Rutas PROTEGIDAS (Admin)
+router.get('/:id', authenticateToken, productsController.getProductById); // GET /products/:id
+router.post('/', authenticateToken, productsController.createProduct); // POST /products
+router.put('/:id', authenticateToken, productsController.updateProduct); // PUT /products/:id
+router.delete('/:id', authenticateToken, productsController.deleteProduct); // DELETE /products/:id
 
 module.exports = router;

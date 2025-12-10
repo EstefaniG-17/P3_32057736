@@ -1,51 +1,37 @@
-// scripts/seedData.js
-const { Product, Category, Tag } = require('../models');
+// scripts/seedData.js - semillas para libros Maze Runner
+const { sequelize, Category, Tag, Product } = require('../models');
 
 const seedData = async () => {
   try {
-    console.log('=== INICIANDO SEED DE DATOS ===\n');
+    // Para desarrollo queremos partir de una base conocida
+    await sequelize.sync({ force: true });
 
-    // Crear categorías
-    const categories = await Category.bulkCreate([
-      {
-        name: "Young Adult Fiction",
-        description: "Books targeted at teenagers and young adults"
-      },
-      {
-        name: "Science Fiction",
-        description: "Fiction based on imagined future scientific or technological advances"
-      },
-      {
-        name: "Dystopian",
-        description: "Fiction set in a society that is undesirable or frightening"
-      },
-      {
-        name: "Action & Adventure",
-        description: "Fast-paced stories with exciting adventures"
-      }
-    ], { ignoreDuplicates: true });
+    // Crear categorías (aseguramos al menos 4, porque el dataset usa categories[3])
+    const categoriesData = [
+      { name: 'Books', description: 'Libros y novelas' },
+      { name: 'Comics', description: 'Cómics y novelas gráficas' },
+      { name: 'Box Sets', description: 'Ediciones en caja' },
+      { name: 'Companion', description: 'Libros complementarios y guías' }
+    ];
+    const categories = await Category.bulkCreate(categoriesData);
 
-    console.log('✓ Categorías creadas');
+    // Crear tags en el orden esperado por los índices usados en el dataset
+    const tagsData = [
+      'dystopian', // 0
+      'young-adult', // 1
+      'graphic-novel', // 2
+      'companion', // 3
+      'collector', // 4
+      'ebook', // 5
+      'special-edition', // 6
+      'box-set', // 7
+      'paperback', // 8
+      'hardcover' // 9
+    ].map(name => ({ name }));
+    const tags = await Tag.bulkCreate(tagsData);
 
-    // Crear tags
-    const tags = await Tag.bulkCreate([
-      { name: "Bestseller" },
-      { name: "Trilogy" },
-      { name: "Movie Adaptation" },
-      { name: "Adventure" },
-      { name: "Mystery" },
-      { name: "Thriller" },
-      { name: "Post-Apocalyptic" },
-      { name: "Survival" },
-      { name: "Series" },
-      { name: "Award Winning" }
-    ], { ignoreDuplicates: true });
-
-    console.log('✓ Tags creados');
-
-    // Datos CORREGIDOS - usando los campos exactos del modelo Product.js
+    // Arreglo de libros (usamos índices de tags, luego los convertimos a ids)
     const mazeRunnerBooks = [
-      // Serie principal
       {
         name: "The Maze Runner",
         slug: "the-maze-runner",
@@ -61,7 +47,7 @@ const seedData = async () => {
         pages: 384,
         format: "Tapa dura",
         isAvailable: true,
-        tagIds: [tags[0].id, tags[1].id, tags[2].id, tags[3].id, tags[4].id, tags[6].id, tags[7].id]
+        tagIndices: [0,1,2,3,4,6,7]
       },
       {
         name: "The Scorch Trials",
@@ -78,7 +64,7 @@ const seedData = async () => {
         pages: 361,
         format: "Tapa dura",
         isAvailable: true,
-        tagIds: [tags[0].id, tags[1].id, tags[2].id, tags[3].id, tags[5].id, tags[6].id, tags[7].id]
+        tagIndices: [0,1,2,3,5,6,7]
       },
       {
         name: "The Death Cure",
@@ -95,7 +81,7 @@ const seedData = async () => {
         pages: 325,
         format: "Tapa dura",
         isAvailable: true,
-        tagIds: [tags[0].id, tags[1].id, tags[2].id, tags[3].id, tags[5].id, tags[6].id, tags[7].id]
+        tagIndices: [0,1,2,3,5,6,7]
       },
       {
         name: "The Kill Order",
@@ -112,7 +98,7 @@ const seedData = async () => {
         pages: 327,
         format: "Tapa dura",
         isAvailable: true,
-        tagIds: [tags[0].id, tags[3].id, tags[5].id, tags[6].id, tags[7].id, tags[8].id]
+        tagIndices: [0,3,5,6,7,8]
       },
       {
         name: "The Fever Code",
@@ -129,10 +115,8 @@ const seedData = async () => {
         pages: 368,
         format: "Tapa dura",
         isAvailable: true,
-        tagIds: [tags[0].id, tags[3].id, tags[4].id, tags[6].id, tags[7].id, tags[8].id]
+        tagIndices: [0,3,4,6,7,8]
       },
-      
-      // Libros complementarios
       {
         name: "The Maze Runner Files",
         slug: "the-maze-runner-files",
@@ -148,7 +132,7 @@ const seedData = async () => {
         pages: 192,
         format: "Tapa blanda",
         isAvailable: true,
-        tagIds: [tags[8].id, tags[4].id]
+        tagIndices: [8,4]
       },
       {
         name: "Crank Palace",
@@ -165,10 +149,8 @@ const seedData = async () => {
         pages: 288,
         format: "Tapa blanda",
         isAvailable: true,
-        tagIds: [tags[0].id, tags[8].id, tags[5].id, tags[6].id]
+        tagIndices: [0,8,5,6]
       },
-      
-      // Ediciones especiales
       {
         name: "The Maze Runner Series Box Set",
         slug: "the-maze-runner-series-box-set",
@@ -184,7 +166,7 @@ const seedData = async () => {
         pages: 1765,
         format: "Tapa dura",
         isAvailable: true,
-        tagIds: [tags[0].id, tags[1].id, tags[8].id, tags[9].id]
+        tagIndices: [0,1,8,9]
       },
       {
         name: "The Maze Runner: The Graphic Novel",
@@ -201,7 +183,7 @@ const seedData = async () => {
         pages: 224,
         format: "Tapa blanda",
         isAvailable: true,
-        tagIds: [tags[2].id, tags[8].id, tags[3].id]
+        tagIndices: [2,8,3]
       },
       {
         name: "Maze Runner: E-book Edition",
@@ -218,7 +200,7 @@ const seedData = async () => {
         pages: 384,
         format: "E-book",
         isAvailable: true,
-        tagIds: [tags[0].id, tags[2].id]
+        tagIndices: [0,2]
       },
       {
         name: "The Maze Runner (Spanish Edition)",
@@ -235,69 +217,41 @@ const seedData = async () => {
         pages: 400,
         format: "Tapa blanda",
         isAvailable: true,
-        tagIds: [tags[0].id, tags[2].id]
+        tagIndices: [0,2]
       }
     ];
 
-    console.log('\n✓ Creando productos...\n');
-
-    // Crear productos
-    for (const bookData of mazeRunnerBooks) {
-      const { tagIds, ...productData } = bookData;
-      
-      // El slug ya está definido en cada objeto, pero si no, se genera automáticamente por el hook
-      const product = await Product.create(productData);
-      
-      if (tagIds && tagIds.length > 0) {
-        await product.setTags(tagIds);
-      }
-      
-      console.log(`✓ Creado: ${product.name} (Slug: ${product.slug})`);
+    // Crear productos y asociar tags
+    for (const pb of mazeRunnerBooks) {
+      const tagIds = (pb.tagIndices || []).map(i => tags[i].id).filter(Boolean);
+      const data = {
+        name: pb.name,
+        slug: pb.slug,
+        description: pb.description,
+        price: pb.price,
+        stock: pb.stock,
+        author: pb.author,
+        isbn: pb.isbn,
+        publicationYear: pb.publicationYear,
+        publisher: pb.publisher,
+        language: pb.language,
+        pages: pb.pages,
+        format: pb.format,
+        isAvailable: pb.isAvailable,
+        CategoryId: pb.categoryId
+      };
+      const prod = await Product.create(data);
+      if (tagIds.length) await prod.setTags(tagIds);
     }
 
-    console.log('\n=== VERIFICACIÓN FINAL ===');
-    
-    // Contar productos
-    const totalProducts = await Product.count();
-    console.log(`✓ Total de productos creados: ${totalProducts}`);
-    
-    // Verificar algunos productos
-    const sampleProducts = await Product.findAll({
-      limit: 3,
-      include: [
-        { model: Category, as: 'category' },
-        { model: Tag, as: 'tags' }
-      ]
-    });
-    
-    console.log('\n✓ Muestra de productos:');
-    sampleProducts.forEach(p => {
-      console.log(`  - ${p.name} (${p.category.name}) - $${p.price} - Stock: ${p.stock}`);
-      console.log(`    Tags: ${p.tags.map(t => t.name).join(', ')}`);
-    });
-
-    console.log('\n✅ SEED COMPLETADO EXITOSAMENTE!');
-    console.log('\nPara probar el endpoint:');
-    console.log('1. curl http://localhost:8080/products');
-    console.log('2. curl "http://localhost:8080/products?page=1&limit=5"');
-    console.log('3. curl "http://localhost:8080/products?category=1"');
-    console.log('4. curl "http://localhost:8080/products?author=James"');
-    
+    console.log('✅ Maze Runner seed completed');
   } catch (error) {
-    console.error('\n❌ Error en el seed:', error.message);
-    console.error('Stack:', error.stack);
+    console.error('❌ Seed error:', error && error.stack ? error.stack : error);
   }
 };
 
-// Si se ejecuta directamente
 if (require.main === module) {
-  seedData().then(() => {
-    console.log('\nProceso terminado.');
-    process.exit(0);
-  }).catch(error => {
-    console.error('Error fatal:', error);
-    process.exit(1);
-  });
+  seedData().then(() => process.exit(0));
 }
 
 module.exports = seedData;

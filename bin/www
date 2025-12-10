@@ -12,7 +12,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3001');
+var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
@@ -25,8 +25,7 @@ var server = http.createServer(app);
  */
 
 // Sincronizar base de datos antes de arrancar el servidor
-// Usar la instancia de Sequelize desde `models` (misma que la app usa)
-const db = require('../models');
+const { syncDatabase } = require('../database');
 
 // Manejo global de errores no atrapados para evitar salidas silenciosas
 process.on('unhandledRejection', (reason, p) => {
@@ -39,11 +38,7 @@ process.on('uncaughtException', (err) => {
 
 async function startServer() {
   try {
-    // Sincronizar modelos usados por la app (crea tablas si no existen)
-    if (db && db.sequelize) {
-      await db.sequelize.sync();
-      console.log('Database synchronized (models)');
-    }
+    await syncDatabase();
     server.listen(port);
     console.log('Starting server (listen called) on port ' + port);
     server.on('error', onError);

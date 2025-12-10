@@ -1,16 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/userController');
-const auth = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
+const {
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser
+} = require('../controllers/userController');
 
-// ✅ Todas las rutas requieren autenticación
-router.use(auth);
+// Todas las rutas requieren autenticación
+router.use(authenticateToken);
 
-// ✅ CRUD COMPLETO para Users
-router.post('/', userController.createUser);
-router.get('/', userController.getAllUsers);
-router.get('/:id', userController.getUserById);
-router.put('/:id', userController.updateUser);
-router.delete('/:id', userController.deleteUser);
+router.get('/', getAllUsers);
+router.get('/:id', getUserById);
+router.post('/', createUser);
+router.put('/:id', updateUser);
+router.delete('/:id', deleteUser);
 
 module.exports = router;

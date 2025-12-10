@@ -1,203 +1,161 @@
 const request = require('supertest');
-const app = require('../app');
-const { User, Category, Product, Tag, sequelize } = require('../models');
-const jwt = require('jsonwebtoken');
+const app = require('../src/app');
+const { Product, Category, Tag } = require('../src/models');
 
-describe('Products API - Maze Runner Books', () => {
-  let adminToken;
-  let testCategory;
-  let testProduct;
-  let testTag;
+describe('Product Self-Healing URLs', () => {
+  it('should redirect to correct slug when slug is incorrect', async () => {
+    const product = await Product.create({
+      name: 'Iron Man Mark L Funko Pop',
+      price: 34.99,
+      slug: 'iron-man-mark-l-funko-pop'
+    });
+
+    await request(app)
+      .get(`/products/p/${product.id}-wrong-slug`)
+      .expect(301)
+      .expect('Location', `/products/p/${product.id}-iron-man-mark-l-funko-pop`);
+  });
+});
+
+
+describe('Products API', () => {
+  let token;
+  let categoryId;
+  let tagId;
+  let productId;
 
   beforeAll(async () => {
-    try {
-      await sequelize.sync({ force: true });
-      
-      // Crear usuario admin
-      const adminUser = await User.create({
-        name: 'Test Admin',
-        email: 'admin@test.com',
-        password: 'password123',
-        role: 'admin'
-      });
+    // Sincronizar base de datos de prueba
+    await sequelize.sync({ force: true });
+    
+    // Crear token JWT de prueba (simulado)
+    token = 'test-jwt-token';
+  });
 
-      // Crear categoría
-      testCategory = await Category.create({
-        name: 'Libros de Ciencia Ficción',
-        description: 'Libros de ciencia ficción y distopía'
-      });
+  describe('POST /categories (Protected)', () => {
+    it('should create a category with valid token', async () => {
+      const response = await request(app)
+        .post('/categories')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          name: 'Avengers',
+          description: 'Avengers movie collection'
+        });
 
-      // Crear tag
-      testTag = await Tag.create({
-        name: 'Distopía'
-      });
+      expect(response.status).toBe(201);
+      expect(response.body.status).toBe('success');
+      expect(response.body.data.name).toBe('Avengers');
+      categoryId = response.body.data.id;
+    });
 
-      // Crear producto de ejemplo (Maze Runner)
-      testProduct = await Product.create({
-        name: 'Maze Runner: Correr o Morir',
-        slug: 'maze-runner-correr-o-morir',
-        description: 'El primer libro de la saga Maze Runner',
-        price: 19.99,
-        categoryId: testCategory.id,
-        author: 'James Dashner',
-        isbn: '978-8427200581',
-        publicationYear: 2009,
-        publisher: 'V&R Editoras',
-        language: 'Español',
-        pages: 384,
-        format: 'Tapa blanda',
-        isAvailable: true,
-        stock: 10
-      });
+    it('should reject without token', async () => {
+      const response = await request(app)
+        .post('/categories')
+        .send({
+          name: 'Test Category',
+          description: 'Test description'
+        });
 
-      await testProduct.addTag(testTag);
+      expect(response.status).toBe(401);
+    });
+  });
 
-      // Generar token
-      adminToken = jwt.sign(
-        { userId: adminUser.id, email: adminUser.email },
-        process.env.JWT_SECRET || 'test-secret',
-        { expiresIn: '24h' }
-      );
+  describe('POST /tags (Protected)', () => {
+    it('should create a tag with valid token', async () => {
+      const response = await request(app)
+        .post('/tags')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          name: 'limited-edition'
+        });
 
-    } catch (error) {
-      console.error('Error en beforeAll:', error);
-    }
+      expect(response.status).toBe(201);
+      expect(response.body.status).toBe('success');
+      expect(response.body.data.name).toBe('limited-edition');
+      tagId = response.body.data.id;
+    });
+  });
+
+  describe('POST /products (Protected)', () => {
+  it('should create a product with valid token', async () => {
+    const productData = {
+      name: "Iron Man Mark LXXXV",
+      description: "Funko Pop de Iron Man con traje de Endgame",
+      price: 29.99,
+      stock: 50,
+      sku: "AVG001",
+      movie: "Avengers: Endgame",
+      character: "Iron Man", 
+      edition: "Standard",
+      releaseYear: 2024,
+      CategoryId: categoryId,
+      tags: [tagId]
+    };
+
+    const response = await request(app)
+      .post('/products')
+      .set('Authorization', `Bearer ${token}`)
+      .send(productData);
+    expect(response.body.data.name).toBe('Iron Man Mark LXXXV');
+    expect(response.body.data.character).toBe('Iron Man');
+    expect(response.body.data.movie).toBe('Avengers: Endgame');
+    // Guardar el id creado para pruebas posteriores
+    productId = response.body.data.id;
+  });
+});
+
+  describe('GET /products (Public)', () => {
+    it('should return products with pagination', async () => {
+      const response = await request(app)
+        .get('/products')
+        .query({ page: 1, limit: 10 });
+
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe('success');
+      expect(response.body.data.products).toBeInstanceOf(Array);
+      expect(response.body.data.pagination).toHaveProperty('page', 1);
+    });
+
+    it('should filter products by movie', async () => {
+      const response = await request(app)
+        .get('/products')
+        .query({ movie: 'Endgame' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.products.length).toBeGreaterThan(0);
+    });
+
+    it('should filter products by character', async () => {
+      const response = await request(app)
+        .get('/products')
+        .query({ character: 'Iron Man' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.products[0].character).toBe('Iron Man');
+    });
+  });
+
+  describe('GET /p/:id-:slug (Public - Self-healing)', () => {
+    it('should return product with correct slug', async () => {
+      const response = await request(app)
+        .get(`/p/${productId}-iron-man-mark-lxxxv-avg001`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe('success');
+      expect(response.body.data.id).toBe(productId);
+    });
+
+    it('should redirect with 301 when slug is incorrect', async () => {
+      const response = await request(app)
+        .get(`/p/${productId}-wrong-slug-name`)
+        .redirects(0); // Prevenir redirección automática
+
+      expect(response.status).toBe(301);
+      expect(response.header.location).toContain(`/p/${productId}-iron-man-mark-lxxxv-avg001`);
+    });
   });
 
   afterAll(async () => {
     await sequelize.close();
   });
-
-  describe('Public Endpoints - Products Search', () => {
-    it('should return products list with pagination', async () => {
-      const res = await request(app).get('/products');
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.status).toEqual('success');
-      expect(res.body.data).toBeInstanceOf(Array);
-      expect(res.body.pagination).toHaveProperty('total');
-    });
-
-    it('should filter products by author', async () => {
-      const res = await request(app).get('/products?author=James');
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.data[0].author).toContain('James');
-    });
-
-    it('should filter products by price range', async () => {
-      const res = await request(app).get('/products?price_min=10&price_max=30');
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.data.length).toBeGreaterThan(0);
-    });
-
-    it('should filter products by publisher', async () => {
-      const res = await request(app).get('/products?publisher=V&R');
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.data[0].publisher).toContain('V&R');
-    });
-
-    it('should filter products by format', async () => {
-      const res = await request(app).get('/products?format=Tapa blanda');
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.data[0].format).toEqual('Tapa blanda');
-    });
-
-    it('should search products by name', async () => {
-      const res = await request(app).get('/products?search=Maze');
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.data[0].name).toContain('Maze');
-    });
-  });
-
-  describe('Self-Healing URL', () => {
-    it('should redirect when slug is incorrect', async () => {
-      const res = await request(app)
-        .get('/p/1-wrong-slug-name')
-        .redirects(0); // No seguir redirecciones automáticamente
-      
-      expect(res.statusCode).toEqual(301);
-      expect(res.headers.location).toContain('/p/1-maze-runner-correr-o-morir');
-    });
-
-    it('should return product when slug is correct', async () => {
-      const res = await request(app).get('/p/1-maze-runner-correr-o-morir');
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.status).toEqual('success');
-      expect(res.body.data.name).toContain('Maze Runner');
-    });
-  });
-
-  describe('Protected Endpoints - Products Management', () => {
-    it('should return 401 when creating product without token', async () => {
-      const res = await request(app)
-        .post('/products')
-        .send({ 
-          name: 'New Maze Runner Book',
-          price: 24.99,
-          categoryId: 1 
-        });
-      expect(res.statusCode).toEqual(401);
-    });
-
-    it('should create product with valid token', async () => {
-      const res = await request(app)
-        .post('/products')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          name: 'Maze Runner: Prueba de Fuego',
-          price: 21.99,
-          categoryId: testCategory.id,
-          author: 'James Dashner',
-          isbn: '978-8427200598',
-          publicationYear: 2010,
-          pages: 400,
-          format: 'Tapa blanda'
-        });
-      expect([201, 200]).toContain(res.statusCode);
-    });
-  });
-
-  describe('Categories and Tags Protected Endpoints', () => {
-    it('should return 401 when getting categories without token', async () => {
-      const res = await request(app).get('/categories');
-      expect(res.statusCode).toEqual(401);
-    });
-
-    it('should get categories with valid token', async () => {
-      const res = await request(app)
-        .get('/categories')
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect([200, 500]).toContain(res.statusCode);
-    });
-  });
-
-  describe('Admin Users Endpoints', () => {
-  it('should return users list with admin token', async () => {
-    const res = await request(app)
-      .get('/users')
-      .set('Authorization', `Bearer ${adminToken}`);
-    expect([200, 500]).toContain(res.statusCode);
-  });
-
-  it('should return 401 when getting users without token', async () => {
-    const res = await request(app).get('/users');
-    expect(res.statusCode).toEqual(401);
-  });
-});
-
-describe('Categories CRUD Endpoints', () => {
-  it('should update category with valid token', async () => {
-    const res = await request(app)
-      .put('/categories/1')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ name: 'Updated Category' });
-    expect([200, 404]).toContain(res.statusCode);
-  });
-
-  it('should delete category with valid token', async () => {
-    const res = await request(app)
-      .delete('/categories/1')
-      .set('Authorization', `Bearer ${adminToken}`);
-    expect([200, 404]).toContain(res.statusCode);
-  });
-});
 });

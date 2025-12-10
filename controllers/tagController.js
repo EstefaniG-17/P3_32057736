@@ -1,65 +1,41 @@
+// controllers/tagController.js - NUEVO ARCHIVO
 const { Tag } = require('../models');
-const responseHelper = require('../helpers/responseHelper');
+const asyncHandler = require('../utils/asyncHandler');
 
-const tagController = {
-  async getAll(req, res) {
-    try {
-      const tags = await Tag.findAll();
-      responseHelper.success(res, tags);
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
-  },
+exports.getTags = asyncHandler(async (req, res) => {
+  const tags = await Tag.findAll();
+  res.jsend.success(tags);
+});
 
-  async getById(req, res) {
-    try {
-      const tag = await Tag.findByPk(req.params.id);
-      if (!tag) {
-        return responseHelper.fail(res, 'Tag not found');
-      }
-      responseHelper.success(res, tag);
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
-  },
-
-  async create(req, res) {
-    try {
-      const { name } = req.body;
-      const tag = await Tag.create({ name });
-      responseHelper.success(res, tag, 'Tag created successfully', 201);
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
-  },
-
-  async update(req, res) {
-    try {
-      const tag = await Tag.findByPk(req.params.id);
-      if (!tag) {
-        return responseHelper.fail(res, 'Tag not found');
-      }
-      
-      await tag.update(req.body);
-      responseHelper.success(res, tag, 'Tag updated successfully');
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
-  },
-
-  async delete(req, res) {
-    try {
-      const tag = await Tag.findByPk(req.params.id);
-      if (!tag) {
-        return responseHelper.fail(res, 'Tag not found');
-      }
-      
-      await tag.destroy();
-      responseHelper.success(res, null, 'Tag deleted successfully');
-    } catch (error) {
-      responseHelper.error(res, error.message);
-    }
+exports.getTagById = asyncHandler(async (req, res) => {
+  const tag = await Tag.findByPk(req.params.id);
+  if (!tag) {
+    return res.status(404).jsend.fail('Tag not found');
   }
-};
+  res.jsend.success(tag);
+});
 
-module.exports = tagController;
+exports.createTag = asyncHandler(async (req, res) => {
+  const tag = await Tag.create(req.body);
+  res.status(201).jsend.success(tag);
+});
+
+exports.updateTag = asyncHandler(async (req, res) => {
+  const tag = await Tag.findByPk(req.params.id);
+  if (!tag) {
+    return res.status(404).jsend.fail('Tag not found');
+  }
+  
+  await tag.update(req.body);
+  res.jsend.success(tag);
+});
+
+exports.deleteTag = asyncHandler(async (req, res) => {
+  const tag = await Tag.findByPk(req.params.id);
+  if (!tag) {
+    return res.status(404).jsend.fail('Tag not found');
+  }
+  
+  await tag.destroy();
+  res.jsend.success({ message: 'Tag deleted successfully' });
+});
