@@ -77,17 +77,21 @@ describe('Products API', () => {
   });
 
   describe('POST /products (Protected)', () => {
-  it('should create a product with valid token', async () => {
+    it('should create a product with valid token', async () => {
     const productData = {
-      name: "Iron Man Mark LXXXV",
-      description: "Funko Pop de Iron Man con traje de Endgame",
-      price: 29.99,
+      name: "The Maze Runner",
+      description: "When Thomas wakes up in the lift...",
+      price: 12.99,
       stock: 50,
-      sku: "AVG001",
-      movie: "Avengers: Endgame",
-      character: "Iron Man", 
-      edition: "Standard",
-      releaseYear: 2024,
+      sku: "BK001",
+      author: "James Dashner",
+      isbn: "978-0385737951",
+      publicationYear: 2009,
+      publisher: "Delacorte Press",
+      language: "English",
+      pages: 384,
+      format: "Tapa dura",
+      isAvailable: true,
       CategoryId: categoryId,
       tags: [tagId]
     };
@@ -96,9 +100,9 @@ describe('Products API', () => {
       .post('/products')
       .set('Authorization', `Bearer ${token}`)
       .send(productData);
-    expect(response.body.data.name).toBe('Iron Man Mark LXXXV');
-    expect(response.body.data.character).toBe('Iron Man');
-    expect(response.body.data.movie).toBe('Avengers: Endgame');
+    expect(response.body.data.name).toBe('The Maze Runner');
+    expect(response.body.data.author).toBe('James Dashner');
+    expect(response.body.data.isbn).toBe('978-0385737951');
     // Guardar el id creado para pruebas posteriores
     productId = response.body.data.id;
   });
@@ -116,29 +120,29 @@ describe('Products API', () => {
       expect(response.body.data.pagination).toHaveProperty('page', 1);
     });
 
-    it('should filter products by movie', async () => {
+    it('should filter products by publisher', async () => {
       const response = await request(app)
         .get('/products')
-        .query({ movie: 'Endgame' });
+        .query({ publisher: 'Delacorte' });
 
       expect(response.status).toBe(200);
       expect(response.body.data.products.length).toBeGreaterThan(0);
     });
 
-    it('should filter products by character', async () => {
+    it('should filter products by author', async () => {
       const response = await request(app)
         .get('/products')
-        .query({ character: 'Iron Man' });
+        .query({ author: 'James Dashner' });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.products[0].character).toBe('Iron Man');
+      expect(response.body.data.products[0].author).toBe('James Dashner');
     });
   });
 
   describe('GET /p/:id-:slug (Public - Self-healing)', () => {
     it('should return product with correct slug', async () => {
       const response = await request(app)
-        .get(`/p/${productId}-iron-man-mark-lxxxv-avg001`);
+        .get(`/p/${productId}-the-maze-runner-bk001`);
 
       expect(response.status).toBe(200);
       expect(response.body.status).toBe('success');
@@ -151,7 +155,7 @@ describe('Products API', () => {
         .redirects(0); // Prevenir redirección automática
 
       expect(response.status).toBe(301);
-      expect(response.header.location).toContain(`/p/${productId}-iron-man-mark-lxxxv-avg001`);
+      expect(response.header.location).toContain(`/p/${productId}-the-maze-runner-bk001`);
     });
   });
 

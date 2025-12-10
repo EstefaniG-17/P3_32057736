@@ -43,15 +43,15 @@ describe('Product Slug Generation', () => {
     await sequelize.close();
   });
 
-  it('should generate slug automatically on create', async () => {
+    it('should generate slug automatically on create', async () => {
     const productData = {
-      name: 'Test Product Avengers',
+      name: 'Test Product Book',
       description: 'Test description',
       price: 25.99,
       stock: 10,
       sku: 'TEST123',
-      movie: 'Avengers: Endgame',
-      character: 'Test Character',
+      author: 'Test Author',
+      isbn: '978-TEST-1234',
       CategoryId: 1
     };
 
@@ -61,7 +61,7 @@ describe('Product Slug Generation', () => {
       .send(productData);
 
     expect(response.status).toBe(201);
-    expect(response.body.data.slug).toBe('test-product-avengers-test123');
+    expect(response.body.data.slug).toBe('test-product-book-test123');
     // No debería enviarse slug en el request
     expect(productData.slug).toBeUndefined();
   });
